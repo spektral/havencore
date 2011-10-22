@@ -13,7 +13,7 @@ class Entity:
 	def update(self):
 		raise NotImplementedError("Not implemented")
 
-	def draw(self):
+	def draw(self, screen):
 		raise NotImplementedError("Not implemented")
 
 def main():
