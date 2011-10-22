@@ -5,15 +5,22 @@
 import pygame
 from pygame.locals import *
 import entity
+import missile
+import vehicle
 
 class GameEngine:
     def __init__(self, screen_res):
         print "Initializing pygame..."
         pygame.init()
+
         self.screen = pygame.display.set_mode(screen_res)
         pygame.display.set_caption("pybattle")
 
+        self.fps_clock = pygame.time.Clock()
+
         self.entities = []
+        self.entities.append(vehicle.Vehicle(10, 10, 0.1))
+        self.entities.append(missile.Missile(10, 10, 1, 1))
 
     def start(self):
         self.is_running = True
@@ -21,6 +28,7 @@ class GameEngine:
             self.handle_input()
             self.update()
             self.draw()
+            self.fps_clock.tick(50)
 
     def quit(self):
         self.is_running = False
