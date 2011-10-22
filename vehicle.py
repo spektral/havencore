@@ -33,21 +33,27 @@ class Vehicle(entity.Entity):
 			if event.key == K_DOWN:
 				self.velocity += 5
 			if event.key == K_RIGHT:
-				self.rotation_torque += 5
+				self.rotation_torque -= 0.1
 			if event.key == K_LEFT:
-				self.rotation_torque -= 5
+				self.rotation_torque += 0.1
 		elif event.type == KEYUP:
 			if event.key == K_UP:
 				self.velocity += 5
 			if event.key == K_DOWN:
 				self.velocity -= 5
 			if event.key == K_RIGHT:
-				self.rotation_torque -= 5
+				self.rotation_torque += 0.1
 			if event.key == K_LEFT:
-				self.rotation_torque += 5
+				self.rotation_torque -= 0.1
 	
 	def update(self):
-		self.x_pos+=(self.rotation_torque * math.sin(self.rotation))
+		self.rotation += self.rotation_torque
+		while self.rotation <= 360:
+			self.rotation += 360
+		while self.rotation >= 360:
+			self.rotation -= 360
+
+		self.x_pos+=(self.velocity * math.sin(self.rotation))
 		self.y_pos+=(self.velocity * math.cos(self.rotation))
 	
 	def draw(self, screen):
