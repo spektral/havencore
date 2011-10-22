@@ -30,7 +30,7 @@ class Missile(entity.Entity):
         self.y_pos+=self.y_vel
 
     def draw(self, screen):
-        pygame.draw.circle(screen, white, (self.x_pos,self.y_pos), 2)
+        pygame.draw.circle(screen, pygame.Color(255,255,255), (self.x_pos,self.y_pos), 2)
     
     def __repr__(self):
         return str(self.x_pos) 
