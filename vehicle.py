@@ -30,7 +30,7 @@ class Vehicle(entity.Entity):
 		pass #so far, does nothing
 	
 	def draw(self, screen):
-		pass #so far, dows nothing
+		pygame.draw.rect(screen, pygame.Color(255,0,0), (10,10,50,100))
 
 	def __repr__(self):
 		return "rot: %.2f, pos: %.2f" % (self.x_pos, self.rotation)
