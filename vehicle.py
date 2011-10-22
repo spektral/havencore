@@ -26,18 +26,24 @@ class Vehicle(entity.Entity):
 		self.y_vel=0
 	
 	def handle_input(self, event):
-		if event.type == KEYDOWN
-			if event.key == K_UP
+		if event.type == KEYDOWN:
+			if event.key == K_UP:
 				self.y_vel = -0.5
-			if event.key == K_DOWN
+			if event.key == K_DOWN:
 				self.y_vel = 0.5
-			if event.key == K_RIGHT
+			if event.key == K_RIGHT:
 				self.x_vel = 0.5
-			if event.key == K_LEFT
+			if event.key == K_LEFT:
 				self.x_vel = -0.5
-		elif event.type == KEYUP
-			self.y_vel = 0
-			self.x_vel = 0
+		elif event.type == KEYUP:
+			if event.key == K_UP:
+				self.y_vel = 0
+			if event.key == K_DOWN:
+				self.y_vel = 0
+			if event.key == K_RIGHT:
+				self.x_vel = 0
+			if event.key == K_LEFT:
+				self.x_vel = 0
 	
 	def update(self):
 		self.x_pos=self.x_vel
