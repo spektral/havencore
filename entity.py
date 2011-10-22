@@ -18,6 +18,7 @@ class Entity:
 
 def main():
 	"""Unit test procedure"""
+	foo = Foo()
 
 if __name__ == "__main__":
 	main()
