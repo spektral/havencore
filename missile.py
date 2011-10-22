@@ -13,21 +13,22 @@
 
 import pygame
 import entity
+import math
 
 class Missile(entity.Entity):
     
-    def __init__(self, x_pos, y_pos, x_vel, y_vel):
-        self.x_pos=x_pos
-        self.y_pos=y_pos
-        self.x_vel=x_vel
-        self.y_vel=y_vel
+    def __init__(self, x_pos, y_pos, vel, rot):
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+        self.vel = vel
+        self.rot = rot
 
     def handle_input(self, event):
         pass
 
     def update(self):
-        self.x_pos+=self.x_vel
-        self.y_pos+=self.y_vel
+        self.x_pos += self.vel * math.sin(self.rot)
+        self.y_pos += self.vel * math.cos(self.rot)
 
     def draw(self, screen):
         pygame.draw.circle(screen, pygame.Color(255,255,255), (int(self.x_pos),int(self.y_pos)), 2)
