@@ -10,6 +10,7 @@
 import pygame
 from pygame.locals import *
 import entity
+import math
 
 class Vehicle(entity.Entity):
 	#def __init__(self):
@@ -23,32 +24,31 @@ class Vehicle(entity.Entity):
 		self.y_pos=y_pos
 		self.rotation=rotation
 		self.rotation_torque=0
-		self.x_vel=0
-		self.y_vel=0
+		self.velocity=0
 	
 	def handle_input(self, event):
 		if event.type == KEYDOWN:
 			if event.key == K_UP:
-				self.y_vel -= 5
+				self.velocity -= 5
 			if event.key == K_DOWN:
-				self.y_vel += 5
+				self.velocity += 5
 			if event.key == K_RIGHT:
-				self.x_vel += 5
+				self.rotation_torque += 5
 			if event.key == K_LEFT:
-				self.x_vel -= 5
+				self.rotation_torque -= 5
 		elif event.type == KEYUP:
 			if event.key == K_UP:
-				self.y_vel += 5
+				self.velocity += 5
 			if event.key == K_DOWN:
-				self.y_vel -= 5
+				self.velocity -= 5
 			if event.key == K_RIGHT:
-				self.x_vel -= 5
+				self.rotation_torque -= 5
 			if event.key == K_LEFT:
-				self.x_vel += 5
+				self.rotation_torque += 5
 	
 	def update(self):
-		self.x_pos+=self.x_vel
-		self.y_pos+=self.y_vel
+		self.x_pos+=(self.rotation_torque * math.sin(self.rotation))
+		self.y_pos+=(self.velocity * math.cos(self.rotation))
 	
 	def draw(self, screen):
 		pygame.draw.circle(screen, pygame.Color(125,10,88), (int(self.x_pos), int(self.y_pos)), 20)
