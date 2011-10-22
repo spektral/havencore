@@ -1,6 +1,16 @@
 #!/usr/bin/python2
-# encoding: utf-8
-# Author: Christofer Odén
+# -*- coding: utf-8 -*-
+
+"""
+This class links the user interface to the game objects and drives the
+game loop.
+
+"""
+
+__author__    = "Christofer Odén"
+__email__     = "bei.oden@gmail.com"
+__copyright__ = "Copyright 2011, Daladevelop"
+__license__   = "GPL"
 
 import pygame
 from pygame.locals import *
