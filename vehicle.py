@@ -20,7 +20,7 @@ class Vehicle(entity.Entity):
 		self.rotation=rotation
 		self.rotation_torque=0
 		self.velocity=0
-		self.cars = self.load_sliced_sprites(40, 40, 'img/car3.png')
+		self.cars = self.load_sliced_sprites(80, 80, 'img/car6.png')
 		self.carIndex = 0
 
 	def load_sliced_sprites(self, w, h, filename):
@@ -58,8 +58,8 @@ class Vehicle(entity.Entity):
 				self.rotation_torque -= 5.0
 	
 	def spriteIndex(self,v):
-		C = (8.0/360.0)
-		index = int(floor((C*(v+22.5)))) % 8
+		C = (36.0/360.0) #C=(8.0/360.0) för 8 bilder 
+		index = int(floor((C*(v+22.5)))) % 36
 	 	return index
 
 	def update(self, lst_ent):
@@ -74,7 +74,7 @@ class Vehicle(entity.Entity):
 
 	def draw(self, screen):
 		#pygame.draw.circle(screen, pygame.Color(255,255,255), (int(self.x_pos), int(self.y_pos)), 25)
-		screen.blit(self.cars[self.carIndex], (int(self.x_pos - 20), int(self.y_pos - 20)))
+		screen.blit(self.cars[self.carIndex], (int(self.x_pos - 40), int(self.y_pos - 40)))
 	
 	def __repr__(self):
 		return "rot: %.2f, pos: (%.2f, %.2f)" % (self.rotation, self.x_pos, self.y_pos)
