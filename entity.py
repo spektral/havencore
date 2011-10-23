@@ -17,7 +17,7 @@ class Entity:
 	def handle_input(self, event):
 		raise NotImplementedError("Not implemented")
 
-	def update(self):
+	def update(self, lst_ent):
 		raise NotImplementedError("Not implemented")
 
 	def draw(self, screen):
