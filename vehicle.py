@@ -46,7 +46,7 @@ class Vehicle(entity.Entity):
 			if event.key == K_LEFT:
 				self.rotation_torque -= 0.1
 	
-	def update(self):
+	def update(self, lst_ent):
 		self.rotation += self.rotation_torque
 		while self.rotation <= 360:
 			self.rotation += 360
