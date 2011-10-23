@@ -11,7 +11,7 @@ import pygame
 from pygame.locals import *
 import entity
 import math
-from math import floor
+from math import floor, radians
 
 class Vehicle(entity.Entity):
 	def __init__(self, x_pos, y_pos, rotation):
@@ -44,35 +44,36 @@ class Vehicle(entity.Entity):
 	def handle_input(self, event):
 		if event.type == KEYDOWN:
 			if event.key == K_UP:
-				self.velocity -= 5
+				self.velocity -= 5.0
 			if event.key == K_DOWN:
-				self.velocity += 5
+				self.velocity += 5.0
 			if event.key == K_RIGHT:
-				self.rotation_torque -= 0.1
+				self.rotation_torque -= 5.0
 			if event.key == K_LEFT:
-				self.rotation_torque += 0.1
+				self.rotation_torque += 5.0
 		elif event.type == KEYUP:
 			if event.key == K_UP:
-				self.velocity += 5
+				self.velocity += 5.0
 			if event.key == K_DOWN:
-				self.velocity -= 5
+				self.velocity -= 5.0
 			if event.key == K_RIGHT:
-				self.rotation_torque += 0.1
+				self.rotation_torque += 5.0
 			if event.key == K_LEFT:
-				self.rotation_torque -= 0.1
+				self.rotation_torque -= 5.0
 	
 	def spriteIndex(self,v):
-		C = (8/360)
-	 	return int(floor((C*(v+22.5)))) % 8
+		C = (8.0/360.0)
+		index = int(floor((C*(v+22.5)))) % 8
+	 	return index
 
 	def update(self):
 		self.rotation += self.rotation_torque
-		while self.rotation <= 360:
-			self.rotation += 360
-		while self.rotation >= 360:
-			self.rotation -= 360
-		self.x_pos+=(self.velocity * math.sin(self.rotation))
-		self.y_pos+=(self.velocity * math.cos(self.rotation))
+		while self.rotation < 0.0:
+			self.rotation += 360.0
+		while self.rotation >= 360.0:
+			self.rotation -= 360.0
+		self.x_pos+=(self.velocity * math.sin(radians(self.rotation)))
+		self.y_pos+=(self.velocity * math.cos(radians(self.rotation)))
 		self.carIndex = self.spriteIndex(self.rotation)
 
 	def draw(self, screen):
