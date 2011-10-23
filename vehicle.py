@@ -44,18 +44,18 @@ class Vehicle(entity.Entity):
 	def handle_input(self, event):
 		if event.type == KEYDOWN:
 			if event.key == K_UP:
-				self.velocity -= 5.0
-			if event.key == K_DOWN:
 				self.velocity += 5.0
+			if event.key == K_DOWN:
+				self.velocity -= 5.0
 			if event.key == K_RIGHT:
 				self.rotation_torque -= 5.0
 			if event.key == K_LEFT:
 				self.rotation_torque += 5.0
 		elif event.type == KEYUP:
 			if event.key == K_UP:
-				self.velocity += 5.0
-			if event.key == K_DOWN:
 				self.velocity -= 5.0
+			if event.key == K_DOWN:
+				self.velocity += 5.0
 			if event.key == K_RIGHT:
 				self.rotation_torque += 5.0
 			if event.key == K_LEFT:
