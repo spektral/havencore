@@ -37,6 +37,7 @@ class GameEngine:
         while(self.is_running):
             self.handle_input()
             self.update()
+            self.collide_detect()
             self.draw()
             self.fps_clock.tick(50)
 
@@ -59,7 +60,12 @@ class GameEngine:
 
     def update(self):
         for entity in self.entities:
-            entity.update(self.entities)
+            entity.update()
+
+    def collide_detect(self):
+        for entity in self.entities:
+            if entity.collide_detect(self.entities):
+                print "COLIDE"
 
     def draw(self):
         self.screen.fill(pygame.Color(66, 66, 111))

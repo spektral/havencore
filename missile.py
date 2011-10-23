@@ -32,10 +32,12 @@ class Missile(entity.Entity):
     def handle_input(self, event):
         pass
 
-    def update(self, lst_ent):
+    def update(self):
         self.x_pos += self.vel * math.sin(self.rot)
         self.y_pos += self.vel * math.cos(self.rot)
         
+        
+    def collide_detect(self, lst_ent):
         for ent in lst_ent:
             if self is not ent:
                 x_sum = self.x_pos-ent.x_pos
@@ -44,7 +46,9 @@ class Missile(entity.Entity):
                 y_sum = y_sum * y_sum
 
                 if math.sqrt(x_sum+y_sum) < 22:
-                    print "KOL"
+                    return 1
+                else:
+                    return 0
 
     def draw(self, screen):
         pygame.draw.circle(screen, pygame.Color(255,255,255), (int(self.x_pos),int(self.y_pos)), 2)

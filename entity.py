@@ -19,6 +19,9 @@ class Entity:
 
 	def update(self):
 		raise NotImplementedError("Not implemented")
+	
+        def collide_detect(self, lst_ent):
+		raise NotImplementedError("Not implemented")
 
 	def draw(self, screen):
 		raise NotImplementedError("Not implemented")
