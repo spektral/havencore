@@ -20,11 +20,7 @@ class Vehicle(entity.Entity):
 		self.rotation=rotation
 		self.rotation_torque=0
 		self.velocity=0
-		#self.car = pygame.image.load("car.png")
-		#self.car.convert_alpha(self.car)
-		#colorkey = self.car.get_at((0,0))
-		#self.car.set_colorkey(colorkey, RLEACCEL)
-		self.cars = self.load_sliced_sprites(40, 40, 'car2.png')
+		self.cars = self.load_sliced_sprites(40, 40, 'img/car3.png')
 		self.carIndex = 0
 
 	def load_sliced_sprites(self, w, h, filename):
@@ -32,7 +28,7 @@ class Vehicle(entity.Entity):
 
 		master_image = pygame.image.load(filename)
 		master_image.convert_alpha()
-		colorkey = master_image.get_at((1,1))
+		colorkey = master_image.get_at((0,0))
 		master_image.set_colorkey(colorkey, RLEACCEL)
 
 		master_width, master_height = master_image.get_size()
