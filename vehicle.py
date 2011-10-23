@@ -62,7 +62,7 @@ class Vehicle(entity.Entity):
 		index = int(floor((C*(v+22.5)))) % 8
 	 	return index
 
-	def update(self, lst_ent):
+	def update(self):
 		self.rotation += self.rotation_torque
 		while self.rotation < 0.0:
 			self.rotation += 360.0
@@ -71,7 +71,10 @@ class Vehicle(entity.Entity):
 		self.x_pos+=(self.velocity * math.sin(radians(self.rotation)))
 		self.y_pos+=(self.velocity * math.cos(radians(self.rotation)))
 		self.carIndex = self.spriteIndex(self.rotation)
-
+        
+        def collide_detect(self, lst_ent):
+            pass
+        
 	def draw(self, screen):
 		#pygame.draw.circle(screen, pygame.Color(255,255,255), (int(self.x_pos), int(self.y_pos)), 25)
 		screen.blit(self.cars[self.carIndex], (int(self.x_pos - 20), int(self.y_pos - 20)))
