@@ -65,7 +65,10 @@ class GameEngine:
     def collide_detect(self):
         for entity in self.entities:
             if entity.collide_detect(self.entities):
-                print "COLIDE"
+                if entity.__class__.__name__ == "Missile":
+                    print "Missile COLIDE"
+                elif entity.__class__.__name__ == "Vehicle":
+                    print "Vehicle COLIDE"
 
     def draw(self):
         self.screen.fill(pygame.Color(66, 66, 111))
