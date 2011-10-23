@@ -59,7 +59,7 @@ class GameEngine:
 
     def update(self):
         for entity in self.entities:
-            entity.update()
+            entity.update(self.entities)
 
     def draw(self):
         self.screen.fill(pygame.Color(66, 66, 111))

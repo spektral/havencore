@@ -22,16 +22,33 @@ class Missile(entity.Entity):
         self.y_pos = y_pos
         self.vel = vel
         self.rot = rot
+        
+        self.image = pygame.image.load("img/missile.png")
+        
+        #self.image = self.image.convert()
+        #self.image.set_colorkey((1,255,234), RLEACCEL)
+        #self.rect = self.image.get_rect()
 
     def handle_input(self, event):
         pass
 
-    def update(self):
+    def update(self, lst_ent):
         self.x_pos += self.vel * math.sin(self.rot)
         self.y_pos += self.vel * math.cos(self.rot)
+        
+        for ent in lst_ent:
+            if self is not ent:
+                x_sum = self.x_pos-ent.x_pos
+                x_sum = x_sum * x_sum
+                y_sum = self.y_pos-ent.y_pos
+                y_sum = y_sum * y_sum
+
+                if math.sqrt(x_sum+y_sum) < 22:
+                    print "KOL"
 
     def draw(self, screen):
         pygame.draw.circle(screen, pygame.Color(255,255,255), (int(self.x_pos),int(self.y_pos)), 2)
+        screen.blit(self.image, (self.x_pos-2,self.y_pos-2) )
 
     def __repr__(self):
         return str(self.x_pos) 
@@ -40,5 +57,5 @@ class Missile(entity.Entity):
 if __name__=="__main__":
     test = Missile(2,3,4,1)
     print test
-    test.update()
+    #test.update()
     print test
