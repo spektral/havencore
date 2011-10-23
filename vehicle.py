@@ -28,7 +28,7 @@ class Vehicle(entity.Entity):
 
 		master_image = pygame.image.load(filename)
 		master_image.convert_alpha()
-		colorkey = master_image.get_at((0,0))
+		colorkey = master_image.get_at((1,1))
 		master_image.set_colorkey(colorkey, RLEACCEL)
 
 		master_width, master_height = master_image.get_size()
