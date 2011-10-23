@@ -14,6 +14,7 @@
 import pygame
 import entity
 import math
+from math import floor, radians
 
 class Missile(entity.Entity):
     
@@ -23,18 +24,37 @@ class Missile(entity.Entity):
         self.vel = vel
         self.rot = rot
         
-        self.image = pygame.image.load("img/missile.png")
+        self.unit = self.load_sliced_sprites(32,32, 'img/missile2.png')
+        self.unitIndex = self.spriteIndex(self.rot)
         
-        #self.image = self.image.convert()
-        #self.image.set_colorkey((1,255,234), RLEACCEL)
-        #self.rect = self.image.get_rect()
+
+    def load_sliced_sprites(self, w, h, filename):
+	images = []
+
+        master_image = pygame.image.load(filename).convert()
+	colorkey = (1,255,243)
+	master_image.set_colorkey(colorkey, pygame.RLEACCEL)
+
+	master_width, master_height = master_image.get_size()
+        
+        for i in xrange(int(master_width/w)):
+		images.append(master_image.subsurface((i*w,0,w,h)))
+	return images
+
+
+    def spriteIndex(self,v):
+	C = (40.0/360.0) #C=(8.0/360.0) för 8 bilder 
+	index = int(floor((C*(v+22.5)))) % 40
+ 	return index
+
 
     def handle_input(self, event):
         pass
 
+
     def update(self):
-        self.x_pos += self.vel * math.sin(self.rot)
-        self.y_pos += self.vel * math.cos(self.rot)
+        self.x_pos += self.vel * math.sin(radians(self.rot))
+        self.y_pos += self.vel * math.cos(radians(self.rot))
         
         
     def collide_detect(self, lst_ent):
@@ -45,14 +65,14 @@ class Missile(entity.Entity):
                 y_sum = self.y_pos-ent.y_pos
                 y_sum = y_sum * y_sum
 
-                if math.sqrt(x_sum+y_sum) < 22:
+                if math.sqrt(x_sum+y_sum) < 56:
                     return 1
                 else:
                     return 0
 
     def draw(self, screen):
-        pygame.draw.circle(screen, pygame.Color(255,255,255), (int(self.x_pos),int(self.y_pos)), 2)
-        screen.blit(self.image, (self.x_pos-2,self.y_pos-2) )
+        #pygame.draw.circle(screen, pygame.Color(255,255,255), (int(self.x_pos),int(self.y_pos)), 2)
+        screen.blit(self.unit[self.unitIndex], (self.x_pos-16,self.y_pos-16) )
 
     def __repr__(self):
         return str(self.x_pos) 

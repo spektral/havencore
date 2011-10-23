@@ -29,8 +29,8 @@ class GameEngine:
         self.fps_clock = pygame.time.Clock()
 
         self.entities = []
-        self.entities.append(vehicle.Vehicle(60, 60, 90))
-        self.entities.append(missile.Missile(10, 10, 1, 1))
+        self.entities.append(vehicle.Vehicle(200, 200, 90))
+        self.entities.append(missile.Missile(10, 10, 1, 45))
 
     def start(self):
         self.is_running = True
