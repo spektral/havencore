@@ -28,35 +28,15 @@ class Missile(entity.Entity):
         self.unit = self.load_sliced_sprites(32,32, 'img/missile2.png')
         self.unitIndex = self.spriteIndex(self.rot)
         
-#<<<<<<< HEAD
-# !! Doesent need anymore pg. inherens from entity.py
-# def load_sliced_sprites(self, w, h, filename):
-# images = []
-#=======
 # !! Doesent need anymore. inherates from entity.py
 #    def load_sliced_sprites(self, w, h, filename):
 #	images = []
-#>>>>>>> c7dbc1bfe4cd47485d184b9cc355176b183928f6
 #
-# master_image = pygame.image.load(filename).convert()
-# #colorkey = (1,255,243)
-# colorkey = master_image.get_at((0,0))
-# master_image.set_colorkey(colorkey, pygame.RLEACCEL)
+#       master_image = pygame.image.load(filename).convert()
+#       #colorkey = (1,255,243)
+#       colorkey = master_image.get_at((0,0))
+#       master_image.set_colorkey(colorkey, pygame.RLEACCEL)
 #
-#<<<<<<< HEAD
-# master_width, master_height = master_image.get_size()
-#
-# for i in xrange(int(master_width/w)):
-# images.append(master_image.subsurface((i*w,0,w,h)))
-# return images
-#------------------------------------------------------
-
-    def spriteIndex(self,v):
-	C = (40.0/360.0) #C=(8.0/360.0) för 8 bilder
-	index = int(floor((C*(v+22.5)))) % 40
-	return index
-
-#=======
 #	master_width, master_height = master_image.get_size()
 #        
 #        for i in xrange(int(master_width/w)):
@@ -70,7 +50,6 @@ class Missile(entity.Entity):
 #	index = int(floor((C*(v+22.5)))) % 40 
 #	return index
 #======================================================
-#>>>>>>> c7dbc1bfe4cd47485d184b9cc355176b183928f6
 
     def handle_input(self, event):
         pass
