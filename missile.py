@@ -1,6 +1,6 @@
 #!/usr/bin python
 #coding=UTF-8
-#==============================================================================
+#==========================================================================
 # File: missile.py
 #
 # Author: Max Sidenstjärna
@@ -9,7 +9,7 @@
 #
 # Comment: 
 #
-#==============================================================================
+#==========================================================================
 
 import pygame
 import entity
@@ -27,20 +27,21 @@ class Missile(entity.Entity):
         self.unit = self.load_sliced_sprites(32,32, 'img/missile2.png')
         self.unitIndex = self.spriteIndex(self.rot)
         
-
-    def load_sliced_sprites(self, w, h, filename):
-	images = []
-
-        master_image = pygame.image.load(filename).convert()
-	colorkey = (1,255,243)
-	master_image.set_colorkey(colorkey, pygame.RLEACCEL)
-
-	master_width, master_height = master_image.get_size()
-        
-        for i in xrange(int(master_width/w)):
-		images.append(master_image.subsurface((i*w,0,w,h)))
-	return images
-
+# !! Doesent need anymore pg. inherens from entity.py
+#    def load_sliced_sprites(self, w, h, filename):
+#	images = []
+#
+#       master_image = pygame.image.load(filename).convert()
+#	#colorkey = (1,255,243)
+#	colorkey = master_image.get_at((0,0))
+#       master_image.set_colorkey(colorkey, pygame.RLEACCEL)
+#
+#	master_width, master_height = master_image.get_size()
+#        
+#        for i in xrange(int(master_width/w)):
+#		images.append(master_image.subsurface((i*w,0,w,h)))
+#	return images
+#------------------------------------------------------
 
     def spriteIndex(self,v):
 	C = (40.0/360.0) #C=(8.0/360.0) för 8 bilder 
