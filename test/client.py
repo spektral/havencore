@@ -1,4 +1,13 @@
 #!/usr/bin/python2 -tt
+# -*- coding: utf-8 -*-
+
+"""
+Class for handling client side network communication.
+
+"""
+
+__copyright__ = "Copyright 2011, Daladevelop"
+__license__   = "GPL"
 
 import socket
 
@@ -41,3 +50,5 @@ if __name__ == "__main__":
             print(answer)
         except socket.error:
             pass
+
+# vim: set ts=4 sw=4 et

@@ -1,4 +1,13 @@
-#!/usr/bin/python2
+#!/usr/bin/python2 -tt
+# -*- coding: utf-8 -*-
+
+"""
+Class for handling server side network communication.
+
+"""
+
+__copyright__ = "Copyright 2011, Daladevelop"
+__license__   = "GPL"
 
 import socket
 import select
@@ -61,3 +70,5 @@ if __name__ == "__main__":
         listener.receive()
         while listener.events:
             listener.broadcast(listener.events.pop(0))
+
+# vim: set ts=4 sw=4 et
