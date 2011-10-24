@@ -17,6 +17,7 @@ from pygame.locals import *
 import entity
 import missile
 import vehicle
+import explode
 
 class GameEngine:
     def __init__(self, screen_res):
@@ -29,8 +30,8 @@ class GameEngine:
         self.fps_clock = pygame.time.Clock()
 
         self.entities = []
-        self.entities.append(vehicle.Vehicle(60, 60, 90))
-        self.entities.append(missile.Missile(10, 10, 1, 1))
+        self.entities.append(vehicle.Vehicle(200, 200, 90))
+        self.entities.append(missile.Missile(10, 10, 1, 45))
 
     def start(self):
         self.is_running = True
@@ -60,13 +61,21 @@ class GameEngine:
 
     def update(self):
         for entity in self.entities:
-            entity.update()
+            if entity.__class__.__name__ == "Explode":
+                if entity.unitIndex > entity.num_rec-2:
+                    self.entities.remove(entity)
+                else:
+                    entity.update()
+            else:
+                entity.update()
     
     def collide_detect(self):
         for entity in self.entities:
             if entity.collide_detect(self.entities):
                 if entity.__class__.__name__ == "Missile":
                     print "Missile Collide"
+                    self.entities.append(explode.Explode(entity.x_pos, entity.y_pos, 'img/explosion2.png', 18, 64))
+                    self.entities.remove(entity)
                 elif entity.__class__.__name__ == "Vehicle":
                     print "Vehicle Collide"
 
