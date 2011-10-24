@@ -12,6 +12,7 @@ __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
 
 import pygame
+import math
 
 class Entity:
 	def handle_input(self, event):
@@ -36,6 +37,11 @@ class Entity:
             for i in xrange(int(master_width/w)):
 	        images.append(master_image.subsurface((i*w,0,w,h)))
 	    return images
+
+        def spriteIndex(self,v):
+	    C = (self.img_rec_num/360.0) #C=(8.0/360.0) för 8 bilder 
+	    index = int(math.floor((C*(v+22.5)))) % self.img_rec_num
+ 	    return index
 
 	def draw(self, screen):
 		raise NotImplementedError("Not implemented")

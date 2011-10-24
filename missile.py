@@ -1,6 +1,6 @@
 #!/usr/bin python
 #coding=UTF-8
-#==========================================================================
+#========================================================================
 # File: missile.py
 #
 # Author: Max Sidenstjärna
@@ -9,7 +9,7 @@
 #
 # Comment: 
 #
-#==========================================================================
+#========================================================================
 
 import pygame
 import entity
@@ -23,11 +23,12 @@ class Missile(entity.Entity):
         self.y_pos = y_pos
         self.vel = vel
         self.rot = rot
+        self.img_rec_num = 40
         
         self.unit = self.load_sliced_sprites(32,32, 'img/missile2.png')
         self.unitIndex = self.spriteIndex(self.rot)
         
-# !! Doesent need anymore pg. inherens from entity.py
+# !! Doesent need anymore. inherates from entity.py
 #    def load_sliced_sprites(self, w, h, filename):
 #	images = []
 #
@@ -41,13 +42,14 @@ class Missile(entity.Entity):
 #        for i in xrange(int(master_width/w)):
 #		images.append(master_image.subsurface((i*w,0,w,h)))
 #	return images
+#
 #------------------------------------------------------
-
-    def spriteIndex(self,v):
-	C = (40.0/360.0) #C=(8.0/360.0) för 8 bilder 
-	index = int(floor((C*(v+22.5)))) % 40
- 	return index
-
+#
+#    def spriteIndex(self,v):
+#	C = (40.0/360.0) #C=(8.0/360.0) för 8 bilder 
+#	index = int(floor((C*(v+22.5)))) % 40 
+#	return index
+#======================================================
 
     def handle_input(self, event):
         pass
