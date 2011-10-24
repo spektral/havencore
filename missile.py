@@ -23,10 +23,10 @@ class Missile(entity.Entity):
         self.y_pos = y_pos
         self.vel = vel
         self.rot = rot
-        self.img_rec_num = 40
+        #self.img_rec_num = 40
         
         self.unit = self.load_sliced_sprites(32,32, 'img/missile2.png')
-        self.unitIndex = self.spriteIndex(self.rot)
+        self.unitIndex = self.spriteIndex(self.rot, 40)
         
 # !! Doesent need anymore. inherates from entity.py
 #    def load_sliced_sprites(self, w, h, filename):

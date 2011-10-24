@@ -38,9 +38,9 @@ class Entity:
 	        images.append(master_image.subsurface((i*w,0,w,h)))
 	    return images
 
-        def spriteIndex(self,v):
-	    C = (self.img_rec_num/360.0) #C=(8.0/360.0) för 8 bilder 
-	    index = int(math.floor((C*(v+22.5)))) % self.img_rec_num
+        def spriteIndex(self,v, num_rec):
+	    C = (num_rec/360.0) #C=(8.0/360.0) för 8 bilder 
+	    index = int(math.floor((C*(v+22.5)))) % num_rec
  	    return index
 
 	def draw(self, screen):
