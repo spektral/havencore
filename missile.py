@@ -23,7 +23,7 @@ class Missile(entity.Entity):
         self.vel = vel
         self.rot = rot
         
-        self.image = pygame.image.load("img/missile.png")
+        self.image = pygame.image.load("img/missil_2.png")
         
         #self.image = self.image.convert()
         #self.image.set_colorkey((1,255,234), RLEACCEL)
