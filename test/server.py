@@ -18,40 +18,46 @@ class Listener:
         if readable:
             s = readable[0]
 
-            # Parse the data
-            data, addr = s.recvfrom(1024)
-            fields = data.split('|')
+            while True:
+                # Parse the data
+                try:
+                    data, addr = s.recvfrom(1024)
+                except socket.error as e:
+                    if e.errno == 11:
+                        break
 
-            if not len(fields) == 3:
-                sys.stderr.write("Malformed packet: %s" % data)
+                fields = data.split('|')
 
-            # Begin constructing the event object
-            event = {}
-            try:
-                event['id'] = { 'name': fields[0],
-                        'addr': addr }
-                event['type'] = fields[1]
-                event['data'] = fields[2]
-            except IndexError:
-                sys.stderr.write("Malformed packet: %s" % data)
+                if not len(fields) == 3:
+                    sys.stderr.write("Malformed packet: %s" % data)
 
-            if not event['id'] in self.peers:
-                self.peers[event['id']] = True
+                # Begin constructing the event object
+                event = {}
+                try:
+                    event['id'] = { 'name': fields[0],
+                            'addr': addr }
+                    event['type'] = fields[1]
+                    event['data'] = fields[2]
+                except IndexError:
+                    sys.stderr.write("Malformed packet: %s" % data)
 
-            self.events.append(event)
+                if not event['id']['name'] in self.peers:
+                    self.peers[event['id']['name']] = event['id']['addr']
+
+                self.events.append(event)
 
     def broadcast(self, data):
-        write_list = [self.socket]
-        readable, writable, in_error = select.select(write_list, [], [], 0)
-        if writable:
-            s = writable[0]
-            for peer in self.peers:
-                s.sendto(data, peer['addr'])
+        for peer in self.peers.values():
+            self.socket.sendto(str(data), peer)
 
+
+
+#
+#   Unit test procedure
+#
 if __name__ == "__main__":
     listener = Listener(60000)
     while True:
         listener.receive()
         while listener.events:
-            print(listener.events.pop())
-        listener.broadcast("BCAST")
+            listener.broadcast(listener.events.pop(0))
