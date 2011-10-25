@@ -7,7 +7,7 @@
 # Date: 2011-10-22
 # Licens: GPL
 #
-# Comment: 
+# Comment:
 #
 #========================================================================
 
@@ -23,18 +23,18 @@ class Missile(entity.Entity):
         self.y_pos = y_pos
         self.vel = vel
         self.rot = rot
-        self.img_rec_num = 40
+        #self.img_rec_num = 40
         
         self.unit = self.load_sliced_sprites(32,32, 'img/missile2.png')
-        self.unitIndex = self.spriteIndex(self.rot)
+        self.unitIndex = self.spriteIndex(self.rot, 40)
         
 # !! Doesent need anymore. inherates from entity.py
 #    def load_sliced_sprites(self, w, h, filename):
 #	images = []
 #
 #       master_image = pygame.image.load(filename).convert()
-#	#colorkey = (1,255,243)
-#	colorkey = master_image.get_at((0,0))
+#       #colorkey = (1,255,243)
+#       colorkey = master_image.get_at((0,0))
 #       master_image.set_colorkey(colorkey, pygame.RLEACCEL)
 #
 #	master_width, master_height = master_image.get_size()
@@ -78,7 +78,7 @@ class Missile(entity.Entity):
         screen.blit(self.unit[self.unitIndex], (self.x_pos-16,self.y_pos-16) )
 
     def __repr__(self):
-        return str(self.x_pos) 
+        return str(self.x_pos)
 
 # Debug main
 if __name__=="__main__":

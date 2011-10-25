@@ -1,23 +1,54 @@
+#!/usr/bin/python2 -tt
+# -*- coding: utf-8 -*-
 
-from twisted.internet.protocol import DatagramProtocol
-from twisted.internet import reactor
+"""
+Class for handling client side network communication.
 
-class Helloer(DatagramProtocol):
+"""
 
-    def startProtocol(self):
-        host = "192.168.255.247"
-        port = 60000
+__copyright__ = "Copyright 2011, Daladevelop"
+__license__   = "GPL"
 
-        self.transport.connect(host, port)
-        print "Connected"
-        self.transport.write("helo")
+import socket
 
-    def datagramReceived(self, data, (host,port)):
-        print "Received %r from %s:%d" % (data, host, port)
+class Sender:
+    def __init__(self, name, port):
+        self.name = name
+        self.port = port
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    def connectionRefused(self):
-        print "No connection!"
+    def send_msg(self, data):
+        self.socket.sendto("%s|%s|%s" % (self.name, "msg", data), ('127.0.0.1', self.port))
 
 
-reactor.listenUDP(0, Helloer())
-reactor.run()
+
+#
+#   Unit test procedure
+#
+if __name__ == "__main__":
+    sender = Sender('spektre', 60000)
+    sender.send_msg("Hello")
+    sender.send_msg("World!")
+    sender.send_msg("Hello")
+    sender.send_msg("World!")
+    sender.send_msg("Hello")
+    sender.send_msg("World!")
+    sender.send_msg("Hello")
+    sender.send_msg("World!")
+    sender.send_msg("Hello")
+    sender.send_msg("World!")
+    sender.send_msg("Hello")
+    sender.send_msg("World!")
+    sender.send_msg("Hello")
+    sender.send_msg("World!")
+    sender.send_msg("Hello")
+    sender.send_msg("World!")
+    while True:
+        sender.socket.setblocking(0)
+        try:
+            answer = sender.socket.recvfrom(1024)
+            print(answer)
+        except socket.error:
+            pass
+
+# vim: set ts=4 sw=4 et
