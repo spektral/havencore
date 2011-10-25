@@ -6,7 +6,7 @@ class Helloer(DatagramProtocol):
 
     def startProtocol(self):
         host = "192.168.255.247"
-        port = 9999
+        port = 60000
 
         self.transport.connect(host, port)
         print "Connected"
