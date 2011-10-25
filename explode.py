@@ -12,9 +12,9 @@
 #========================================================================
 
 import pygame
-import entity
+import animation
 
-class Explode(entity.Entity):
+class Explode():
 
     def __init__(self, x_pos, y_pos, filename, num_rec, size):
         self.x_pos = x_pos
@@ -23,22 +23,24 @@ class Explode(entity.Entity):
         self.unitIndex = 0
         self.size = size
         self.num_rec = num_rec
-        self.unit = self.load_sliced_sprites(size,size, filename)
-
+        self.unit = animation.Animation("img/explosion2.png", (64, 64), 2)
+    
     def handle_input(self, event):
         pass
 
     def update(self): 
-        self.index += 1
+        #self.unit.play()
+        self.unit.update()
+        #self.index += 1
         
         # Here you can set the speed of the animation.
         # I think it looks best in full speed //eCo
-        if self.index >= 1:
-            self.unitIndex += 1
-            self.index = 0
-
+        #if self.index >= 1:
+            #self.unitIndex += 1
+            #self.index = 0
     def collide_detect(self, lst_ent):
         pass
 
     def draw(self, screen):
-        screen.blit(self.unit[self.unitIndex], (self.x_pos-(self.size/2), self.y_pos-(self.size/2) ) )
+        self.unit.draw(screen, self.x_pos, self.y_pos)
+        #screen.blit(self.unit[self.unitIndex], (self.x_pos-(self.size/2), self.y_pos-(self.size/2) ) )
