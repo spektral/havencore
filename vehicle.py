@@ -70,7 +70,7 @@ class Vehicle(entity.Entity):
             self.rotation -= 360.0
         self.x_pos+=(self.velocity * math.sin(radians(self.rotation)))
         self.y_pos+=(self.velocity * math.cos(radians(self.rotation)))
-        self.carIndex = self.spriteIndex(self.rotation)
+        self.carIndex = self.spriteIndex(self.rotation,36)
 
     def collide_detect(self, lst_ent):
         pass
