@@ -14,45 +14,33 @@ __license__   = "GPL"
 
 import pygame
 from pygame.locals import *
-import entity
-import missile
-import vehicle
-import explode
 
-class GameEngine:
+class GameEngine(object):
     """
     Game engine is implemented according to the "Borg" pattern.  All instances
     share the same data.
     
     """
 
-    entities = []
-
-    def __init__(self):
-        pass
-
-    def initialize(self, screen_res):
+    def __init__(self, screen_res):
         print "Initializing pygame..."
         pygame.init()
 
+        self.entities = []
+
+        print "Setting up screen..."
         self.screen = pygame.display.set_mode(screen_res)
         pygame.display.set_caption("pybattle")
-
         self.fps_clock = pygame.time.Clock()
 
-        self.entities.append(vehicle.Vehicle(200, 200, 90))
-        self.entities.append(missile.Missile(10, 10, 1, 45))
-        print("Entities: %s" % self.entities)
-
-    def get_entities(self):
-        return getattr(self, 'entities', None)
+    def add_entity(self, entity):
+        self.entities.append(entity)
 
     def start(self):
         self.is_running = True
         while(self.is_running):
             self.handle_input()
             self.update()
-            #self.collide_detect()
             self.draw()
             self.fps_clock.tick(50)
 
@@ -90,12 +78,10 @@ class GameEngine:
             entity.draw(self.screen)
 
         pygame.display.update()
-        print(self.entities)
 
     def __repr__(self):
         return self.entities
 
-if __name__ == "__main__":
-    game_engine = GameEngine()
-    game_engine.initialize((640, 480))
-    game_engine.start()
+
+
+gameengine = GameEngine((640, 480))

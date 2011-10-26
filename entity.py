@@ -36,7 +36,6 @@ class Entity:
                 dx = entity.x - self.x
                 dy = entity.y - self.y
                 rr = (entity.r + self.r) / 2
-                # Pythagoras theorem with sqrt optimzed out
                 if dx * dx + dy * dy < rr * rr:
                     self.collision_list.append(entity)
 
