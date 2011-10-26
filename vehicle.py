@@ -29,9 +29,15 @@ class Vehicle(Entity):
         self.sprite = RotSprite("img/car6_fixed.png", (80,80))
         self.health = 100
         self.children = []
-
+        gameengine.JukeBox.loadSound('rocket.ogg','rocket')
     def handle_input(self, event):
         if event.type == KEYDOWN:
+            if event.key == K_z:
+                self.fire()
+
+            if event.key == K_SPACE:
+                self.fire()
+
             if event.key == K_UP:
                 self.vel += 5.0
 
@@ -43,9 +49,6 @@ class Vehicle(Entity):
 
             if event.key == K_LEFT:
                 self.torque += 5.0
-
-            if event.key == K_SPACE:
-                self.fire()
 
         elif event.type == KEYUP:
             if event.key == K_UP:
@@ -75,7 +78,7 @@ class Vehicle(Entity):
             gameengine.add_entity(Explosion(self.x, self.y,
                 "img/explosion2.png", (64, 64), 2))
             self.alive = False
-
+            gameengine.JukeBox.playSound('rocket')
         self.rot += self.torque
 
         while self.rot < 0.0:

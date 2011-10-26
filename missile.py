@@ -44,7 +44,8 @@ class Missile(entity.Entity):
                 gameengine.add_entity(explosion.Explosion(self.x, self.y,
                     "img/explosion2.png", (64, 64), 2))
                 self.alive = False
-
+                gameengine.JukeBox.playSound('rocket')
+			
         self.x += self.vel * sin(radians(self.rot))
         self.y += self.vel * cos(radians(self.rot))
 

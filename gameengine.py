@@ -14,6 +14,7 @@ __license__   = "GPL"
 
 import pygame
 from pygame.locals import *
+from jukebox import JukeBox
 
 class GameEngine(object):
     """
@@ -21,27 +22,28 @@ class GameEngine(object):
     share the same data.
     
     """
-
-    def __init__(self, screen_res):
+    def initialize(self, screen_res):
         print "Initializing pygame..."
         pygame.init()
-
         self.entities = []
+        self.JukeBox = JukeBox()
 
-        print "Setting up screen..."
+        print "Setting up video mode..."
         self.screen = pygame.display.set_mode(screen_res)
         pygame.display.set_caption("pybattle")
-        self.fps_clock = pygame.time.Clock()
 
     def add_entity(self, entity):
         self.entities.append(entity)
 
     def start(self):
+        self.fps_clock = pygame.time.Clock()
+
         self.is_running = True
         while(self.is_running):
             self.handle_input()
             self.update()
             self.draw()
+            self.JukeBox.timeToChangeSong()
             self.fps_clock.tick(50)
 
     def quit(self):
@@ -72,7 +74,7 @@ class GameEngine(object):
         self.entities = [e for e in self.entities if e.alive == True]
 
     def draw(self):
-        self.screen.fill(pygame.Color(66, 66, 111))
+        self.screen.fill((66, 66, 111))
 
         for entity in self.entities:
             entity.draw(self.screen)
@@ -84,4 +86,4 @@ class GameEngine(object):
 
 
 
-gameengine = GameEngine((640, 480))
+gameengine = GameEngine()
