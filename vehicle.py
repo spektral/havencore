@@ -10,6 +10,8 @@
 import pygame
 from pygame.locals import *
 import entity
+import missile
+import rotsprite
 import math
 from math import floor, radians
 
@@ -20,7 +22,7 @@ class Vehicle(entity.Entity):
         self.rotation=rotation
         self.rotation_torque=0
         self.velocity=0
-        self.cars = self.load_sliced_sprites(80, 80, 'img/car6.png')
+        self.cars = rotsprite.RotSprite("img/car6_fixed.png", (80,80))
         self.carIndex = 0
 
     def handle_input(self, event):
@@ -33,6 +35,9 @@ class Vehicle(entity.Entity):
                 self.rotation_torque -= 5.0
             if event.key == K_LEFT:
                 self.rotation_torque += 5.0
+            if event.key == K_SPACE:
+                print "MISSILE AWAY"
+                #self.ActiveMissile.append(missile.Missile(self.x_pos, self.y_pos, 12, self.rotation))
         elif event.type == KEYUP:
             if event.key == K_UP:
                 self.velocity -= 5.0
@@ -51,18 +56,16 @@ class Vehicle(entity.Entity):
             self.rotation -= 360.0
         self.x_pos+=(self.velocity * math.sin(radians(self.rotation)))
         self.y_pos+=(self.velocity * math.cos(radians(self.rotation)))
-        self.carIndex = self.spriteIndex(self.rotation,36)
+        self.cars.set_direction(self.rotation)
 
     def collide_detect(self, lst_ent):
         pass
 
     def draw(self, screen):
-        screen.blit(self.cars[self.carIndex], (int(self.x_pos - 40), int(self.y_pos - 40)))
+        self.cars.draw(screen, self.x_pos, self.y_pos)
 
     def __repr__(self):
         return "rot: %.2f, pos: (%.2f, %.2f)" % (self.rotation, self.x_pos, self.y_pos)
-
-
 
 #
 #   Unit test procedure
