@@ -20,18 +20,28 @@ import vehicle
 import explode
 
 class GameEngine:
+    """
+    Game engine is implemented according to the "Borg" pattern.  All instances
+    share the same data.
+    
+    """
+    _we_are_borg = {}
+
     def __init__(self, screen_res):
-        print "Initializing pygame..."
-        pygame.init()
+        self.__dict__ = self._we_are_borg
 
-        self.screen = pygame.display.set_mode(screen_res)
-        pygame.display.set_caption("pybattle")
+        if self.__dict__ == {}:
+            print "Initializing pygame..."
+            pygame.init()
 
-        self.fps_clock = pygame.time.Clock()
+            self.screen = pygame.display.set_mode(screen_res)
+            pygame.display.set_caption("pybattle")
 
-        self.entities = []
-        self.entities.append(vehicle.Vehicle(200, 200, 90))
-        self.entities.append(missile.Missile(10, 10, 1, 45))
+            self.fps_clock = pygame.time.Clock()
+
+            self.entities = []
+            self.entities.append(vehicle.Vehicle(200, 200, 90))
+            self.entities.append(missile.Missile(10, 10, 1, 45))
 
     def start(self):
         self.is_running = True
@@ -44,7 +54,8 @@ class GameEngine:
 
     def quit(self):
         self.is_running = False
-
+    
+    # Better name "handle_events"
     def handle_input(self):
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -59,15 +70,15 @@ class GameEngine:
             for entity in self.entities:
                 entity.handle_input(event)
 
+        for entity in self.entities:
+            entity.check_collisions(self.entities)
+
     def update(self):
         for entity in self.entities:
-            if entity.__class__.__name__ == "Explode":
-                if entity.unitIndex > entity.num_rec-2:
-                    self.entities.remove(entity)
-                else:
-                    entity.update()
-            else:
-                entity.update()
+#            if entity.__class__.__name__ == "Explode":
+#                if entity.unitIndex > entity.num_rec-2:
+#                    self.entities.remove(entity)
+            entity.update()
     
     def collide_detect(self):
         for entity in self.entities:

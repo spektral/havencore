@@ -17,7 +17,9 @@ class Animation:
         self.current_frame = 0
         self.ticker = 0
         self.delay = delay
-        self.running = False
+        self.running = True
+        self.loop = True
+        self.finished = False
 
         self.load_image(filename, frame_size)
 
@@ -53,16 +55,21 @@ class Animation:
                                                  self.w, self.h)))
 
     def update(self):
-        self.ticker += 1
-        if (self.ticker >= self.delay):
-            self.current_frame += 1
-            if self.current_frame >= self.frame_count:
-                self.current_frame = 0
-            self.ticker = 0
+        if self.running:
+            self.ticker += 1
+            if (self.ticker > self.delay):
+                self.current_frame += 1
+                if self.current_frame >= self.frame_count:
+                    if self.loop == False:
+                        self.finished = True
+                    else:
+                        self.current_frame = 0
+                self.ticker = 0
 
     def draw(self, screen, x, y):
-        screen.blit(self.frames[self.current_frame],
-                    (x - self.w / 2, y - self.h / 2))
+        if not self.finished:
+            screen.blit(self.frames[self.current_frame],
+                        (x - self.w / 2, y - self.h / 2))
 
 
 
