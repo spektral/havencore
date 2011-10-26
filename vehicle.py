@@ -72,7 +72,7 @@ class Vehicle(Entity):
 
         if self.health <= 0:
             self.health = 0
-            gameengine.add_entity(Explosion(self.x, self.y,
+            gameengine.add_entity(Explosion((self.x, self.y),
                 "img/explosion2.png", (64, 64), 2))
             self.alive = False
 
