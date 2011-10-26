@@ -25,30 +25,34 @@ class GameEngine:
     share the same data.
     
     """
-    _we_are_borg = {}
 
-    def __init__(self, screen_res):
-        self.__dict__ = self._we_are_borg
+    entities = []
 
-        if self.__dict__ == {}:
-            print "Initializing pygame..."
-            pygame.init()
+    def __init__(self):
+        pass
 
-            self.screen = pygame.display.set_mode(screen_res)
-            pygame.display.set_caption("pybattle")
+    def initialize(self, screen_res):
+        print "Initializing pygame..."
+        pygame.init()
 
-            self.fps_clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode(screen_res)
+        pygame.display.set_caption("pybattle")
 
-            self.entities = []
-            self.entities.append(vehicle.Vehicle(200, 200, 90))
-            self.entities.append(missile.Missile(10, 10, 1, 45))
+        self.fps_clock = pygame.time.Clock()
+
+        self.entities.append(vehicle.Vehicle(200, 200, 90))
+        self.entities.append(missile.Missile(10, 10, 1, 45))
+        print("Entities: %s" % self.entities)
+
+    def get_entities(self):
+        return getattr(self, 'entities', None)
 
     def start(self):
         self.is_running = True
         while(self.is_running):
             self.handle_input()
             self.update()
-            self.collide_detect()
+            #self.collide_detect()
             self.draw()
             self.fps_clock.tick(50)
 
@@ -75,21 +79,9 @@ class GameEngine:
 
     def update(self):
         for entity in self.entities:
-#            if entity.__class__.__name__ == "Explode":
-#                if entity.unitIndex > entity.num_rec-2:
-#                    self.entities.remove(entity)
             entity.update()
-    
-    def collide_detect(self):
-        for entity in self.entities:
-            if entity.collide_detect(self.entities):
-                if entity.__class__.__name__ == "Missile":
-                    print "Missile Collide"
-                    self.entities.append(explode.Explode(entity.x_pos, entity.y_pos, 'img/explosion2.png', 18, 64))
-                    self.entities.remove(entity)
-                elif entity.__class__.__name__ == "Vehicle":
-                    print "Vehicle Collide"
 
+        self.entities = [e for e in self.entities if e.alive == True]
 
     def draw(self):
         self.screen.fill(pygame.Color(66, 66, 111))
@@ -98,11 +90,12 @@ class GameEngine:
             entity.draw(self.screen)
 
         pygame.display.update()
-
+        print(self.entities)
 
     def __repr__(self):
         return self.entities
 
 if __name__ == "__main__":
-    game_engine = GameEngine((640, 480))
+    game_engine = GameEngine()
+    game_engine.initialize((640, 480))
     game_engine.start()

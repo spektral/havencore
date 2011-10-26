@@ -13,66 +13,79 @@ import entity
 import missile
 import rotsprite
 import math
+import gameengine
+import explosion
 from math import floor, radians
 
 class Vehicle(entity.Entity):
-    def __init__(self, x_pos, y_pos, rotation):
-        self.x_pos=x_pos
-        self.y_pos=y_pos
-        self.rotation=rotation
-        self.rotation_torque=0
-        self.velocity=0
-        self.cars = rotsprite.RotSprite("img/car6_fixed.png", (80,80))
-        self.carIndex = 0
+    def __init__(self, x, y, rot):
+        entity.Entity.__init__(self, x, y, 40)
+        self.rot = rot
+        self.torque = 0
+        self.vel = 0
+        self.sprite = rotsprite.RotSprite("img/car6_fixed.png", (80,80))
+        self.health = 100
 
     def handle_input(self, event):
         if event.type == KEYDOWN:
             if event.key == K_UP:
-                self.velocity += 5.0
+                self.vel += 5.0
             if event.key == K_DOWN:
-                self.velocity -= 5.0
+                self.vel -= 5.0
             if event.key == K_RIGHT:
-                self.rotation_torque -= 5.0
+                self.torque -= 5.0
             if event.key == K_LEFT:
-                self.rotation_torque += 5.0
+                self.torque += 5.0
             if event.key == K_SPACE:
                 print "MISSILE AWAY"
-                #self.ActiveMissile.append(missile.Missile(self.x_pos, self.y_pos, 12, self.rotation))
+                #self.ActiveMissile.append(missile.Missile(self.x, self.y, 12, self.rot))
         elif event.type == KEYUP:
             if event.key == K_UP:
-                self.velocity -= 5.0
+                self.vel -= 5.0
             if event.key == K_DOWN:
-                self.velocity += 5.0
+                self.vel += 5.0
             if event.key == K_RIGHT:
-                self.rotation_torque += 5.0
+                self.torque += 5.0
             if event.key == K_LEFT:
-                self.rotation_torque -= 5.0
+                self.torque -= 5.0
 
     def update(self):
-        self.rotation += self.rotation_torque
-        while self.rotation < 0.0:
-            self.rotation += 360.0
-        while self.rotation >= 360.0:
-            self.rotation -= 360.0
-        self.x_pos+=(self.velocity * math.sin(radians(self.rotation)))
-        self.y_pos+=(self.velocity * math.cos(radians(self.rotation)))
-        self.cars.set_direction(self.rotation)
+        ge = gameengine.GameEngine()
+
+        while self.collision_list:
+            if isinstance(self.collision_list.pop(0), missile.Missile):
+                self.health -= 40
+
+        if self.health <= 0:
+            self.health = 0
+            ge.entities.append(explosion.Explosion(self.x, self.y,
+                "img/explosion2.png", (64, 64), 2))
+            self.alive = False
+
+        self.rot += self.torque
+
+        while self.rot < 0.0:
+            self.rot += 360.0
+        while self.rot >= 360.0:
+            self.rot -= 360.0
+
+        self.x += (self.vel * math.sin(radians(self.rot)))
+        self.y += (self.vel * math.cos(radians(self.rot)))
+        self.sprite.set_direction(self.rot)
 
     def collide_detect(self, lst_ent):
         pass
 
     def draw(self, screen):
-        self.cars.draw(screen, self.x_pos, self.y_pos)
+        self.sprite.draw(screen, self.x, self.y)
 
     def __repr__(self):
-        return "rot: %.2f, pos: (%.2f, %.2f)" % (self.rotation, self.x_pos, self.y_pos)
-
+        return ("(Vehicle, alive:%s rot:%.2f, vel:%.2f, (x%.2f, y%.2f))" %
+            (self.alive, self.rot, self.vel, self.x, self.y))
 #
 #   Unit test procedure
 #
 if __name__ == "__main__":
-    print "test_main"
-    V = Vehicle(4.0,11.0,90)
-    print V
+    pass
 
 # vim: set ts=4 sw=4 et

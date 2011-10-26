@@ -11,18 +11,18 @@
 #
 #========================================================================
 
-import gameengine
 import pygame
 import explosion
 import entity
 import rotsprite
 import math
+import gameengine
 from math import floor, radians
 
 class Missile(entity.Entity):
     
     def __init__(self, x, y, vel, rot):
-        super(Missile, self).__init__(x, y, 16)
+        entity.Entity.__init__(self, x, y, 16)
         self.vel = vel
         self.rot = rot
         
@@ -33,20 +33,25 @@ class Missile(entity.Entity):
         pass
 
     def update(self):
-        if not self.collision_list == []:
-            GameEngine().entities.remove(self)
-            GameEngine().entities.append(Explosion(self.x, self.y,
-                "img/explosion2.png", (64, 64), 2))
-            self.collision_list = []
+        ge = gameengine.GameEngine()
 
-        self.x_pos += self.vel * math.sin(radians(self.rot))
-        self.y_pos += self.vel * math.cos(radians(self.rot))
+        if not self.collision_list == []:
+            print("Missile entities: %s" % ge.entities)
+            ge.entities.append(explosion.Explosion(self.x, self.y,
+                "img/explosion2.png", (64, 64), 2))
+            print("Missile entities 2: %s" % ge.entities)
+
+            self.alive = False
+
+        self.x += self.vel * math.sin(radians(self.rot))
+        self.y += self.vel * math.cos(radians(self.rot))
 
     def draw(self, screen):
-        self.unit.draw(screen, self.x_pos, self.y_pos)
+        self.unit.draw(screen, self.x, self.y)
 
     def __repr__(self):
-        return str(self.x_pos)
+        return ("(Missile, rot: %.2f, vel: %.2f, (x%.2f, y%.2f))" %
+            (self.rot, self.vel, self.x, self.y))
 
 
 

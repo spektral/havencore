@@ -19,6 +19,7 @@ class Entity:
         self.r = r
         self.collision_list = []
         self.is_collidable = True
+        self.alive = True
 
     def handle_input(self, event):
         raise NotImplementedError("Not implemented")
@@ -29,7 +30,7 @@ class Entity:
     def draw(self, screen):
         raise NotImplementedError("Not implemented")
 
-    def check_collisions(self, entites):
+    def check_collisions(self, entities):
         for entity in entities:
             if entity is not self and entity.is_collidable:
                 dx = entity.x - self.x

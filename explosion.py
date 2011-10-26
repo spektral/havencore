@@ -18,7 +18,7 @@ import animation
 
 class Explosion(entity.Entity):
     def __init__(self, x, y, filename, size, frame_delay):
-        super(Explosion, self).__init__(x, y, 32)
+        entity.Entity.__init__(self, x, y, 32)
         self.animation = animation.Animation(filename, size, frame_delay)
         self.animation.loop = False
         self.is_collidable = False
@@ -29,7 +29,7 @@ class Explosion(entity.Entity):
     def update(self): 
         self.animation.update()
         if self.animation.finished == True:
-            GameEngine().entities.remove(self)
+            self.alive = False
 
     def draw(self, screen):
         self.animation.draw(screen, self.x_pos, self.y_pos)
