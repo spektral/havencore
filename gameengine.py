@@ -14,6 +14,7 @@ __license__   = "GPL"
 
 import pygame
 from pygame.locals import *
+from jukebox import JukeBox
 
 class GameEngine(object):
     """
@@ -25,6 +26,7 @@ class GameEngine(object):
         print "Initializing pygame..."
         pygame.init()
         self.entities = []
+        self.JukeBox = JukeBox()
 
         print "Setting up video mode..."
         self.screen = pygame.display.set_mode(screen_res)
@@ -41,6 +43,7 @@ class GameEngine(object):
             self.handle_input()
             self.update()
             self.draw()
+            self.JukeBox.timeToChangeSong()
             self.fps_clock.tick(50)
 
     def quit(self):
