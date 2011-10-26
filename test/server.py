@@ -69,6 +69,8 @@ if __name__ == "__main__":
     while True:
         listener.receive()
         while listener.events:
-            listener.broadcast(listener.events.pop(0))
+            event = listener.events.pop(0)
+            print(event)
+            listener.broadcast(event)
 
 # vim: set ts=4 sw=4 et

@@ -32,6 +32,12 @@ class Vehicle(Entity):
 
     def handle_input(self, event):
         if event.type == KEYDOWN:
+            if event.key == K_z:
+                self.fire()
+
+            if event.key == K_SPACE:
+                self.fire()
+
             if event.key == K_UP:
                 self.vel += 5.0
 
@@ -43,9 +49,6 @@ class Vehicle(Entity):
 
             if event.key == K_LEFT:
                 self.torque += 5.0
-
-            if event.key == K_SPACE:
-                self.fire()
 
         elif event.type == KEYUP:
             if event.key == K_UP:
