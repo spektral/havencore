@@ -13,7 +13,7 @@ import pygame
 import math
 
 class Entity:
-    def __init__(self, x, y, r):
+    def __init__(self, (x, y), r):
         self.x = x
         self.y = y
         self.r = r

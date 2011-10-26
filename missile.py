@@ -26,8 +26,8 @@ class Missile(entity.Entity):
     Generic class for all projectiles in the game.
 
     """
-    def __init__(self, x, y, vel, rot, filename, size, parent):
-        entity.Entity.__init__(self, x, y, size[0] / 2)
+    def __init__(self, (x, y), vel, rot, filename, size, parent):
+        entity.Entity.__init__(self, (x, y), size[0] / 2)
         self.vel = vel
         self.rot = rot
         self.parent = parent
@@ -41,11 +41,10 @@ class Missile(entity.Entity):
     def update(self):
         for entity in self.collision_list:
             if entity is not self.parent:
-                gameengine.add_entity(explosion.Explosion(self.x, self.y,
+                gameengine.add_entity(explosion.Explosion((self.x, self.y),
                     "img/explosion2.png", (64, 64), 2))
                 self.alive = False
-                gameengine.JukeBox.playSound('rocket')
-			
+
         self.x += self.vel * sin(radians(self.rot))
         self.y += self.vel * cos(radians(self.rot))
 
