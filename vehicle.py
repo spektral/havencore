@@ -10,6 +10,8 @@
 import pygame
 from pygame.locals import *
 import entity
+import missile
+import rotsprite
 import math
 from math import floor, radians
 
@@ -20,22 +22,8 @@ class Vehicle(entity.Entity):
         self.rotation=rotation
         self.rotation_torque=0
         self.velocity=0
-        self.cars = self.load_sliced_sprites(80, 80, 'img/car6.png')
+        self.cars = rotsprite.RotSprite("img/car6_fixed.png", (80,80))
         self.carIndex = 0
-
-#    def load_sliced_sprites(self, w, h, filename):
-#        images = []
-#
-#        master_image = pygame.image.load(filename)
-#        master_image.convert_alpha()
-#        colorkey = master_image.get_at((1,1))
-#        master_image.set_colorkey(colorkey, RLEACCEL)
-#
-#        master_width, master_height = master_image.get_size()
-#
-#        for i in xrange(int(master_width/w)):
-#            images.append(master_image.subsurface((i*w,0,w,h)))
-#        return images
 
     def handle_input(self, event):
         if event.type == KEYDOWN:
@@ -47,6 +35,9 @@ class Vehicle(entity.Entity):
                 self.rotation_torque -= 5.0
             if event.key == K_LEFT:
                 self.rotation_torque += 5.0
+            if event.key == K_SPACE:
+                print "MISSILE AWAY"
+                #self.ActiveMissile.append(missile.Missile(self.x_pos, self.y_pos, 12, self.rotation))
         elif event.type == KEYUP:
             if event.key == K_UP:
                 self.velocity -= 5.0
@@ -57,11 +48,6 @@ class Vehicle(entity.Entity):
             if event.key == K_LEFT:
                 self.rotation_torque -= 5.0
 
-#    def spriteIndex(self,v):
-#        C = (36.0/360.0) #C=(8.0/360.0) för 8 bilder
-#        index = int(floor((C*(v+22.5)))) % 36
-#        return index
-
     def update(self):
         self.rotation += self.rotation_torque
         while self.rotation < 0.0:
@@ -70,19 +56,16 @@ class Vehicle(entity.Entity):
             self.rotation -= 360.0
         self.x_pos+=(self.velocity * math.sin(radians(self.rotation)))
         self.y_pos+=(self.velocity * math.cos(radians(self.rotation)))
-        self.carIndex = self.spriteIndex(self.rotation,36)
+        self.cars.set_direction(self.rotation)
 
     def collide_detect(self, lst_ent):
         pass
 
     def draw(self, screen):
-        #pygame.draw.circle(screen, pygame.Color(255,255,255), (int(self.x_pos), int(self.y_pos)), 25)
-        screen.blit(self.cars[self.carIndex], (int(self.x_pos - 40), int(self.y_pos - 40)))
+        self.cars.draw(screen, self.x_pos, self.y_pos)
 
     def __repr__(self):
         return "rot: %.2f, pos: (%.2f, %.2f)" % (self.rotation, self.x_pos, self.y_pos)
-
-
 
 #
 #   Unit test procedure
