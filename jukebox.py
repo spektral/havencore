@@ -17,10 +17,10 @@ from pygame.locals import *
 
 class JukeBox:
 	def __init__(self):
-		self.soundPath = 'sounds/'
-		self.musicPath = 'music/'
+		self.sound_path = 'sounds/'
+		self.music_path = 'music/'
 
-		self.songs = glob.glob(self.musicPath+'*.ogg')
+		self.songs = glob.glob(self.music_path+'*.ogg')
 		self.sounds = {}
 		counter = 0
 		for track in self.songs:
@@ -30,23 +30,23 @@ class JukeBox:
 		self.play_song(self.track)
 
 	def play_song(self, track = 0):
-		print "Playing song: "+ str(track) +". "+ self.songs[track]
 		pygame.mixer.music.load(self.songs[track])
 		pygame.mixer.music.play()
 
 	def update(self):
-		if self.track +1 < len(self.songs): 
-			self.track = self.track +1
-		else:
-			self.track = 0
 
 		if pygame.mixer.music.get_busy():
 			return
 		else:
-			self.playSong(self.track)
+			if self.track +1 < len(self.songs): 
+				self.track = self.track +1
+			else:
+				self.track = 0
+	
+			self.play_song(self.track)
 
 	def load_sound(self, path, name):
-		self.sounds[name] = pygame.mixer.Sound(self.soundPath+path)
+		self.sounds[name] = pygame.mixer.Sound(self.sound_path+path)
 	
 	def play_sound(self, name):
 		self.sounds[name].play()
