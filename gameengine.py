@@ -28,7 +28,7 @@ class GameEngine(object):
         pygame.init()
         self.mapHandler = MapHandler(WIDTH,HEIGHT,40)
         self.entities = []
-        self.JukeBox = JukeBox()
+        self.jukebox = JukeBox()
 
         print "Setting up video mode..."
         self.screen = pygame.display.set_mode(screen_res)
@@ -45,7 +45,7 @@ class GameEngine(object):
             self.handle_input()
             self.update()
             self.draw()
-            self.JukeBox.timeToChangeSong()
+            self.jukebox.update()
             self.fps_clock.tick(50)
 
     def quit(self):
