@@ -15,7 +15,7 @@ class MapHandler:
         self.height = height
         self.blockSize = blockSize
         self.blockList = []
-        self.initBlockList()
+        self.init_blockList()
         self.initAdjacent()
         
         # for painting and illustrating of algorithms:
@@ -23,9 +23,9 @@ class MapHandler:
         self.delay = DELAY
         self.changed = self.blockList 
 
-    def setScreen(self, screen):
+    def set_screen(self, screen):
         self.screen = screen
-    def initBlockList(self):
+    def init_blockList(self):
         for j in range(self.height/self.blockSize):
             for i in range(self.width/self.blockSize):
                 self.blockList.append(BlockEntity((i*self.blockSize, j*self.blockSize), 0, 0, white, self.blockSize, None))
