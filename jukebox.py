@@ -27,14 +27,14 @@ class JukeBox:
 			self.songs[counter] = track
 			counter = counter +1
 		self.track = 0
-		self.playSong(self.track)
+		self.play_song(self.track)
 
-	def playSong(self, track = 0):
+	def play_song(self, track = 0):
 		print "Playing song: "+ str(track) +". "+ self.songs[track]
 		pygame.mixer.music.load(self.songs[track])
 		pygame.mixer.music.play()
 
-	def timeToChangeSong(self):
+	def update(self):
 		if self.track +1 < len(self.songs): 
 			self.track = self.track +1
 		else:
@@ -45,9 +45,9 @@ class JukeBox:
 		else:
 			self.playSong(self.track)
 
-	def loadSound(self, path, name):
+	def load_sound(self, path, name):
 		self.sounds[name] = pygame.mixer.Sound(self.soundPath+path)
 	
-	def playSound(self, name):
+	def play_sound(self, name):
 		self.sounds[name].play()
 

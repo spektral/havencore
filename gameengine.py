@@ -14,8 +14,9 @@ __license__   = "GPL"
 
 import pygame
 from pygame.locals import *
+from defines import *
 from jukebox import JukeBox
-
+from mapHandler import MapHandler
 class GameEngine(object):
     """
     Game engine is implemented according to the "Borg" pattern.  All instances
@@ -25,8 +26,9 @@ class GameEngine(object):
     def initialize(self, screen_res):
         print "Initializing pygame..."
         pygame.init()
+        self.mapHandler = MapHandler(WIDTH,HEIGHT,40)
         self.entities = []
-        self.JukeBox = JukeBox()
+        self.jukebox = JukeBox()
 
         print "Setting up video mode..."
         self.screen = pygame.display.set_mode(screen_res)
@@ -43,7 +45,7 @@ class GameEngine(object):
             self.handle_input()
             self.update()
             self.draw()
-            self.JukeBox.timeToChangeSong()
+            self.jukebox.update()
             self.fps_clock.tick(50)
 
     def quit(self):
@@ -63,6 +65,7 @@ class GameEngine(object):
 
             for entity in self.entities:
                 entity.handle_input(event)
+                self.mapHandler.handle_input(event)
 
         for entity in self.entities:
             entity.check_collisions(self.entities)
@@ -75,6 +78,8 @@ class GameEngine(object):
 
     def draw(self):
         self.screen.fill((66, 66, 111))
+        self.mapHandler.draw(self.screen)
+        
 
         for entity in self.entities:
             entity.draw(self.screen)
