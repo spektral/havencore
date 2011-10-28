@@ -42,7 +42,7 @@ class Missile(entity.Entity):
         for entity in self.collision_list:
             if entity is not self.parent:
                 gameengine.add_entity(explosion.Explosion((self.x, self.y),
-                    "img/explosion2.png", (64, 64), 2))
+                    "client/img/explosion2.png", (64, 64), 2))
                 self.alive = False
 
         self.x += self.vel * sin(radians(self.rot))

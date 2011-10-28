@@ -3,6 +3,7 @@
 import logging
 import argparse
 import os
+from client.vehicle import Vehicle
 from server.gameengine import gameengine as serverengine
 from client.gameengine import gameengine as clientengine
 
@@ -56,6 +57,7 @@ def main():
         logging.info("Running in client mode...")
         gameengine = clientengine
     gameengine.initialize(args.port)
+    clientengine.add_entity(Vehicle((400, 300), 120))
     gameengine.start()
 
 

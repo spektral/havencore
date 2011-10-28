@@ -20,7 +20,7 @@ class RotSprite(Animation):
 
     def angle_to_index(self, angle):
         slice_size = (self.frame_count / 360.0)
-        index = int(floor(slice_size * (angle + 22.5))) % self.frame_count
+        index = int(floor(slice_size * (angle))) % self.frame_count
         return index
 
 

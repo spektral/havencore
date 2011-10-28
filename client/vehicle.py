@@ -26,7 +26,7 @@ class Vehicle(Entity):
         self.rot = rot
         self.torque = 0
         self.vel = 0
-        self.sprite = RotSprite("img/car6_fixed.png", (80,80))
+        self.sprite = RotSprite("client/img/crawler_sprites.png", (128,128))
         self.health = 100
         self.children = []
         gameengine.jukebox.load_sound('rocket.ogg','rocket')
@@ -75,7 +75,7 @@ class Vehicle(Entity):
         if self.health <= 0:
             self.health = 0
             gameengine.add_entity(Explosion((self.x, self.y),
-                "img/explosion2.png", (64, 64), 2))
+                "client/img/explosion2.png", (64, 64), 2))
             self.alive = False
             gameengine.jukebox.play_sound('rocket')
         self.rot += self.torque
@@ -94,7 +94,7 @@ class Vehicle(Entity):
 
     def fire(self):
         missile = Missile((self.x, self.y), 12, self.rot,
-                "img/missile2.png", (32, 32), self)
+                "client/img/missile2.png", (32, 32), self)
         gameengine.add_entity(missile) 
         self.children.append(missile)
 
