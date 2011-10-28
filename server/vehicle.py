@@ -17,19 +17,18 @@ from math import floor, radians, sin, cos
 from gameengine import gameengine
 from entity import Entity
 from missile import Missile
-from rotsprite import RotSprite
-from explosion import Explosion
 
 class Vehicle(Entity):
     def __init__(self, (x, y), rot):
         Entity.__init__(self, (x, y), 40)
         self.rot = rot
+
         self.torque = 0
         self.vel = 0
-        self.sprite = RotSprite("img/car6_fixed.png", (80,80))
+
         self.health = 100
+
         self.children = []
-        gameengine.jukebox.load_sound('rocket.ogg','rocket')
 
     def handle_input(self, event):
         if event.type == KEYDOWN:
@@ -47,7 +46,6 @@ class Vehicle(Entity):
 
             if event.key == K_SPACE:
                 self.fire()
-                gameengine.jukebox.play_sound('rocket')
 
         elif event.type == KEYUP:
             if event.key == K_UP:
@@ -73,11 +71,7 @@ class Vehicle(Entity):
 
 
         if self.health <= 0:
-            self.health = 0
-            gameengine.add_entity(Explosion((self.x, self.y),
-                "img/explosion2.png", (64, 64), 2))
             self.alive = False
-            gameengine.jukebox.play_sound('rocket')
         self.rot += self.torque
 
         while self.rot < 0.0:
@@ -87,10 +81,9 @@ class Vehicle(Entity):
 
         self.x += (self.vel * sin(radians(self.rot)))
         self.y += (self.vel * cos(radians(self.rot)))
-        self.sprite.set_direction(self.rot)
 
-    def draw(self, screen):
-        self.sprite.draw(screen, self.x, self.y)
+    def get_state(self, screen):
+        return (self.x, self.y, self.rot, self.vel, self.torque)
 
     def fire(self):
         missile = Missile((self.x, self.y), 12, self.rot,

@@ -12,6 +12,7 @@ from argparse import ArgumentParser
 from gameengine import gameengine
 from vehicle import Vehicle
 from missile import Missile
+import logging
 
 def initparse():
     parser = ArgumentParser(description=
@@ -22,10 +23,12 @@ def main():
     parser = initparse()
     args = parser.parse_args()
 
-    gameengine.initialize((800, 600))
+    logging.basicConfig(filename='log.log', filemode='w', level=logging.DEBUG)
+
+    gameengine.initialize(60000)
     gameengine.add_entity(Vehicle((50, 200), 90))
     gameengine.add_entity(Vehicle((250, 200), 90))
-    gameengine.add_entity(Missile((10, 10), 1, 45, "img/missile2.png", (32, 32), None))
+    gameengine.add_entity(Missile((10, 10), 1, 45, (32, 32), None))
     gameengine.start()
 
 main()
