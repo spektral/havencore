@@ -73,4 +73,4 @@ if __name__ == "__main__":
             print(event)
             listener.broadcast(event)
 
-# vim: set ts=4 sw=4 et
+# vim: ts=4 et tw=79 cc=+1

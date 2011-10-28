@@ -11,12 +11,14 @@
 __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
 
+import json
+from math import floor, radians, sin, cos
 import pygame
 from pygame.locals import *
-from math import floor, radians, sin, cos
 from gameengine import gameengine
 from entity import Entity
 from missile import Missile
+
 
 class Vehicle(Entity):
     def __init__(self, (x, y), rot):
@@ -82,9 +84,6 @@ class Vehicle(Entity):
         self.x += (self.vel * sin(radians(self.rot)))
         self.y += (self.vel * cos(radians(self.rot)))
 
-    def get_state(self, screen):
-        return (self.x, self.y, self.rot, self.vel, self.torque)
-
     def fire(self):
         missile = Missile((self.x, self.y), 12, self.rot,
                 "img/missile2.png", (32, 32), self)
@@ -92,12 +91,16 @@ class Vehicle(Entity):
         self.children.append(missile)
 
     def __repr__(self):
-        return ("(Vehicle, alive:%s rot:%.2f, vel:%.2f, (x%.2f, y%.2f))" %
-            (self.alive, self.rot, self.vel, self.x, self.y))
+        """Return a string representation of the instance."""
+        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
+                (self.__class__.__name__, self.alive, self.x, self.y,
+                    self.rot, self.vel))
+
+
 #
 #   Unit test procedure
 #
 if __name__ == "__main__":
     pass
 
-# vim: set ts=4 sw=4 et
+# vim: ts=4 et tw=79 cc=+1

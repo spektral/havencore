@@ -14,9 +14,9 @@
 __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
 
-import entity
-from gameengine import gameengine
 from math import floor, radians, sin, cos
+from gameengine import gameengine
+import entity
 
 class Missile(entity.Entity):
 
@@ -42,10 +42,10 @@ class Missile(entity.Entity):
         self.x += self.vel * sin(radians(self.rot))
         self.y += self.vel * cos(radians(self.rot))
 
-    def get_state(self):
-        """Return where the object is, what way it's facing etc."""
-        return (self.x, self.y, self.vel, self.rot)
-
     def __repr__(self):
-        return ("(Missile, rot: %.2f, vel: %.2f, (x%.2f, y%.2f))" %
-            (self.rot, self.vel, self.x, self.y))
+        """Return a string representation of the instance."""
+        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
+                (self.__class__.__name__, self.alive, self.x, self.y,
+                    self.rot, self.vel))
+
+# vim: ts=4 et tw=79 cc=+1

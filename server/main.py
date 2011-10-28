@@ -1,5 +1,6 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
+
 """
 Launches and initializes the game.
 
@@ -9,10 +10,10 @@ __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
 
 from argparse import ArgumentParser
-from gameengine import gameengine
+import logging
 from vehicle import Vehicle
 from missile import Missile
-import logging
+from gameengine import gameengine
 
 def initparse():
     parser = ArgumentParser(description=
@@ -32,3 +33,5 @@ def main():
     gameengine.start()
 
 main()
+
+# vim: ts=4 et tw=79 cc=+1

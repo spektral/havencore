@@ -37,4 +37,4 @@ if __name__ == "__main__":
         except socket.error:
             pass
 
-# vim: set ts=4 sw=4 et
+# vim: ts=4 et tw=79 cc=+1

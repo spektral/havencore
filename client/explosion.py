@@ -33,3 +33,5 @@ class Explosion(entity.Entity):
 
     def draw(self, screen):
         self.animation.draw(screen, self.x, self.y)
+
+# vim: ts=4 et tw=79 cc=+1

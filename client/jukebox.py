@@ -17,8 +17,8 @@ from pygame.locals import *
 
 class JukeBox:
 	def __init__(self):
-		self.sound_path = 'sounds/'
-		self.music_path = 'music/'
+		self.sound_path = 'client/sounds/'
+		self.music_path = 'client/music/'
 
 		self.songs = glob.glob(self.music_path+'*.ogg')
 		self.sounds = {}
@@ -51,3 +51,4 @@ class JukeBox:
 	def play_sound(self, name):
 		self.sounds[name].play()
 
+# vim: ts=4 et tw=79 cc=+1

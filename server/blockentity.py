@@ -100,3 +100,5 @@ class BlockEntity(Entity):
         self.g = g
     def setParent(self, parent):
         self.parent = parent
+
+# vim: ts=4 et tw=79 cc=+1
