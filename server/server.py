@@ -8,6 +8,7 @@ from socket import *
 import logging
 import select
 import json
+import zlib
 
 class Server:
     """
@@ -21,36 +22,45 @@ class Server:
         self.clients = []
 
     def start(self):
+        """Start the server."""
         self.sock.bind(self.addr)
-        logging.info("Server listening on port %s:%s" % self.addr)
+        logging.info("Server listening on %s:%s." % self.addr)
         self.sock.listen(5)
 
-    def get_events(self):
-        events = []
+    def get_input(self):
+        """Read input from the network and return a list of it.
+
+        The resulting list of inputs is constructed as:
+        [ {'owner': (host, port), 'events': [ pygame.event, ... ] }, ... ]
+
+        """
+        inputs = []
         read_list = [self.sock] + self.clients
-        logging.debug("read_list: %s" % read_list)
 
         readable, writable, in_error = select.select(read_list, [], [], 0)
         for s in readable:
             if s is self.sock:
                 client, addr = self.sock.accept()
                 self.clients.append(client)
-                logging.info("%s:%s connected" % addr)
+                logging.info("%s:%s connected." % addr)
             else:
-                data = s.recv(4096)
+                data, addr = s.recvfrom(4096)
                 if data:
-                    events += json.loads(data)
+                    try:
+                        inputs += { 'owner': addr, 'events': json.loads(data) }
+                    except ValueError:
+                        pass
                 else:
-                    logging.info("%s:%s disconnected" % addr)
+                    logging.info("Client disconnected.")
                     s.close()
                     self.clients.remove(s)
 
-        return events
+        return inputs
 
     def transmit(self, data):
+        """Send the game state to all clients."""
         send_list = self.clients
-        logging.debug("send_list: %s" % send_list)
-        msg = json.dumps(data)
+        msg = zlib.compress(json.dumps(data, separators=(',',':')))
 
         readable, writable, in_error = select.select([], send_list, [], 0)
         for s in writable:
@@ -58,3 +68,5 @@ class Server:
             sent = s.send(msg)
             if not sent == len(msg):
                 logging.error("Did not transmit all data")
+
+# vim: ts=4 et tw=79 cc=+1

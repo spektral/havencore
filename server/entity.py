@@ -12,7 +12,7 @@ __license__   = "GPL"
 import pygame
 import math
 
-class Entity:
+class Entity(object):
     def __init__(self, (x, y), r):
         self.x = x
         self.y = y
@@ -27,8 +27,9 @@ class Entity:
     def update(self):
         raise NotImplementedError("Not implemented")
 
-    def draw(self, screen):
-        raise NotImplementedError("Not implemented")
+    def get_state(self):
+        """Return a dictionary representation of the instance."""
+        return { '__%s__' % self.__class__.__name__: self.__dict__ }
 
     def check_collisions(self, entities):
         for entity in entities:
@@ -47,4 +48,4 @@ class Entity:
 if __name__ == "__main__":
     entity = Entity()
 
-# vim: set ts=4 sw=4 et
+# vim: ts=4 et tw=79 cc=+1

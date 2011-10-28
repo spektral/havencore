@@ -302,3 +302,5 @@ def getlspace(line):
 
 if __name__ == '__main__':
     main()
+
+# vim: ts=4 et tw=79 cc=+1

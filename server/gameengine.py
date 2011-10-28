@@ -4,6 +4,7 @@
 __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
 
+import logging
 import pygame
 from server import Server 
 
@@ -38,6 +39,8 @@ class GameEngine(object):
 
     def initialize(self, port):
         """Create the server object and an empty entity list."""
+        logging.getLogger(__name__)
+        logging.info("Initializing server engine...")
         self.server = Server(port)
         self.entities = []
 
@@ -47,6 +50,7 @@ class GameEngine(object):
 
     def start(self):
         """Start the game loop and server object."""
+        logging.info("Starting server engine...")
         self.server.start()
         self.fps_clock = pygame.time.Clock()
 
@@ -55,17 +59,20 @@ class GameEngine(object):
             self.handle_input()
             self.update()
             self.handle_output()
-            self.fps_clock.tick(50)
+            self.fps_clock.tick(30)
 
     def quit(self):
         """Break the main game loop."""
+        logging.info("Quitting server engine...")
         self.is_running = False
 
     def handle_input(self):
         """Propagate network input and handle collisions."""
-        for event in self.server.get_events():
+        for inp in self.server.get_input():
             for entity in self.entities:
-                entity.handle_input(event)
+                if entity.owner == inp['owner']:
+                    for event in event['events']:
+                        entity.handle_event(event)
 
         for entity in self.entities:
             entity.check_collisions(self.entities)
@@ -87,3 +94,5 @@ class GameEngine(object):
 
 
 gameengine = GameEngine()
+
+# vim: ts=4 et tw=79 cc=+1

@@ -54,3 +54,5 @@ class Missile(entity.Entity):
     def __repr__(self):
         return ("(Missile, rot: %.2f, vel: %.2f, (x%.2f, y%.2f))" %
             (self.rot, self.vel, self.x, self.y))
+
+# vim: ts=4 et tw=79 cc=+1
