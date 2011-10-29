@@ -11,12 +11,13 @@
 #
 #========================================================================
 
-__copyright__ = "Copyright 2011, Daladevelop"
-__license__   = "GPL"
-
 from math import floor, radians, sin, cos
 from gameengine import gameengine
 from entity import Entity
+
+__author__    = "Max Sidenstjärna"
+__copyright__ = "Copyright 2011 Daladevelop"
+__license__   = "GPL"
 
 class Missile(Entity):
 
@@ -36,8 +37,6 @@ class Missile(Entity):
     def update(self):
 
         """Do logic, react to collisions, move."""
-
-        print("%s.update()" % self.__class__.__name__)
 
         Entity.update(self)
         if self.age > 50:

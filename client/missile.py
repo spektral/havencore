@@ -11,14 +11,15 @@
 #
 #========================================================================
 
-__copyright__ = "Copyright 2011, Daladevelop"
-__license__   = "GPL"
-
 from math import floor, radians, sin, cos
 import pygame
 import explosion
 import entity
 from rotsprite import RotSprite
+
+__author__ = "Max Sidenstjärna"
+__copyright__ = "Copyright 2011 Daladevelop"
+__license__   = "GPL"
 
 class Missile(entity.Entity):
 

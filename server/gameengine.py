@@ -1,13 +1,15 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-__copyright__ = "Copyright 2011, Daladevelop"
-__license__   = "GPL"
-
 import logging
 import pygame
 from pygame.locals import *
 from server import Server 
+
+__author__    = "Christofer Odén"
+__credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
+__copyright__ = "Copyright 2011, Daladevelop"
+__license__   = "GPL"
 
 class GameEngine(object):
 
@@ -39,19 +41,30 @@ class GameEngine(object):
     """
 
     def initialize(self, port):
+
         """Create the server object and an empty entity list."""
-        logging.info("Initializing server engine...")
+
+        self.logger = logging.getLogger('server.gameengine.GameEngine')
+        self.logger.info("Initializing server engine...")
+
         self.server = Server(port)
+
         self.entities = []
 
     def add_entity(self, entity):
+
         """Append the entity to the entity list."""
+
         self.entities.append(entity)
 
     def start(self):
-        """Start the game loop and server object."""
-        logging.info("Starting server engine...")
-        self.server.start()
+
+        """Start the game loop and start listening for clients"""
+
+        self.logger.info("Starting server engine...")
+
+        self.server.listen()
+
         self.fps_clock = pygame.time.Clock()
 
         self.is_running = True
@@ -62,20 +75,21 @@ class GameEngine(object):
             self.fps_clock.tick(50)
 
     def quit(self):
+
         """Break the main game loop."""
-        logging.info("Quitting server engine...")
+
+        self.logger.info("Quitting server engine...")
+
         self.is_running = False
 
     def handle_input(self):
+
         """Propagate network input and handle collisions."""
-        for input in self.server.get_input():
-            for entity in self.entities:
-                if entity.player == input['player']:
-                    for event in input['events']:
-                        if event['type'] in (KEYDOWN, KEYUP):
-                            e = pygame.event.Event(event['type'],
-                                             { 'key': event['key'] })
-                            entity.handle_input(e)
+
+        for player, events in self.server.get_events().iteritems():
+            for entity in filter(lambda x:x.player == player, self.entities):
+                for event in events:
+                    entity.handle_input(event)
 
         for entity in self.entities:
             entity.check_collisions(self.entities)

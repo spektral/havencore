@@ -8,9 +8,6 @@
 #Gustav Fahlén, 2011-10-22
 #-------------------------------------
 
-__copyright__ = "Copyright 2011, Daladevelop"
-__license__   = "GPL"
-
 from math import floor, radians, sin, cos
 import pygame
 from pygame.locals import *
@@ -18,6 +15,10 @@ from entity import Entity
 from missile import Missile
 from rotsprite import RotSprite
 from explosion import Explosion
+
+__author__    = "Gustav Fahlén"
+__copyright__ = "Copyright 2011 Daladevelop"
+__license__   = "GPL"
 
 class Vehicle(Entity):
     def __init__(self, dict, filename, size):

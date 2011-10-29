@@ -1,4 +1,10 @@
 #!/usr/bin/python2
+# -*- coding: utf8 -*-
+
+"""
+Script for launching the game in different modes.
+
+"""
 
 import logging
 import argparse
@@ -8,35 +14,39 @@ from server.vehicle import Vehicle
 from server.gameengine import gameengine as serverengine
 from client.gameengine import gameengine as clientengine
 
+__author__    = "Christofer Odén"
+__copyright__ = "Copyright 2011 Daladevelop"
+__license__   = "GPL"
+
 def start_singleplayer(name, addr):
     if os.fork():
         serverengine.initialize(addr[1])
-        serverengine.add_entity(Vehicle('Player', (400, 300), 120))
         serverengine.start()
     else:
         time.sleep(0.1)
         clientengine.initialize(name, addr)
         clientengine.start()
 
-def setup_logging():
-    logging.basicConfig(filename='log.log', filemode='w', level=logging.INFO)
+def setup_logging(debug):
+    if debug:
+        output = logging.DEBUG
+    else:
+        output = logging.INFO
+
+    logging.basicConfig(filename='log.log', filemode='w', level=output)
     console = logging.StreamHandler()
-    console.setLevel(logging.DEBUG)
+    console.setLevel(output)
     logging.getLogger().addHandler(console)
 
 def parse_args():
-    # expected function:
-    # ./main.py -l -p 9999
-    #    start the server on port 9999
-    # ./main.py 127.0.0.1 -p 9999
-    #    connect to 127.0.0.1 on port 9999
     parser = argparse.ArgumentParser(description='Start the game')
 
-    group = parser.add_mutually_exclusive_group()
+    mode = parser.add_mutually_exclusive_group()
+    output = parser.add_mutually_exclusive_group()
 
-    group.add_argument('host', nargs='?', default='127.0.0.1',
+    mode.add_argument('host', nargs='?', default='127.0.0.1',
             help='server hostname or IP address to connect to')
-    group.add_argument('-s', '--single-player', action='store_true',
+    mode.add_argument('-s', '--single-player', action='store_true',
             help='start a local server and connect to it as a client')
     parser.add_argument('-l', '--listen', action='store_true',
             help='start as server')
@@ -44,13 +54,15 @@ def parse_args():
             help='the port to listen on or connect to')
     parser.add_argument('-n', '--name', default="Player",
             help='sets your player name')
+    output.add_argument('-v', '--verbose', action='store_true',
+            help='show debug output')
     parser.add_argument
 
     return parser.parse_args()
 
 def main():
-    setup_logging()
     args = parse_args()
+    setup_logging(args.verbose)
 
     if args.single_player:
         logging.info("Running in single player mode...")
@@ -61,7 +73,6 @@ def main():
     if args.listen:
         logging.info("Running in server mode...")
         serverengine.initialize(args.port)
-        serverengine.add_entity(Vehicle('Player', (400, 300), 120))
         gameengine = serverengine
     else:
         logging.info("Running in client mode...")

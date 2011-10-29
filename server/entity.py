@@ -1,12 +1,14 @@
 #!/usr/bin/python2 -tt
 # -*- coding: utf-8 -*-
 
+import unittest
+import math
+import pygame
+
+__author__    = "Christofer Odén"
+__credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
 __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
-
-import unittest
-import pygame
-import math
 
 class Entity(object):
 
@@ -55,7 +57,6 @@ class Entity(object):
         except KeyError:
             pass
 
-        print("%s.get_state() -> %s" % (self.__class__.__name__, state))
         return state
 
     def check_collisions(self, entities):

@@ -16,6 +16,10 @@ import entity
 import gameengine
 import animation
 
+__author__    = "Max Sidenstjärna"
+__copyright__ = "Copyright 2011, Daladevelop"
+__license__   = "GPL"
+
 class Explosion(entity.Entity):
     def __init__(self, (x, y), filename, size, frame_delay):
         entity.Entity.__init__(self, (x, y), size[0] / 2)

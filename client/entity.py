@@ -6,11 +6,13 @@ Abstract base class for a common interface to all game objects.
 
 """
 
+import math
+import pygame
+
+__author__    = "Christofer Odén"
+__credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
 __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
-
-import pygame
-import math
 
 class Entity:
     def __init__(self, (x, y), r):

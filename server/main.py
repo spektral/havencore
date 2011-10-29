@@ -6,14 +6,14 @@ Launches and initializes the game.
 
 """
 
-__copyright__ = "Copyright 2011, Daladevelop"
-__license__   = "GPL"
-
 from argparse import ArgumentParser
 import logging
 from vehicle import Vehicle
 from missile import Missile
 from gameengine import gameengine
+
+__copyright__ = "Copyright 2011, Daladevelop"
+__license__   = "GPL"
 
 def initparse():
     parser = ArgumentParser(description=

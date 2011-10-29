@@ -9,7 +9,9 @@ Class for handling sprite animation.
 import pygame
 from pygame.locals import *
 
-__copyright__ = "Copyright 2011, Daladevelop"
+__author__    = "Christofer Odén"
+__credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
+__copyright__ = "Copyright 2011 Daladevelop"
 __license__   = "GPL"
 
 class Animation:

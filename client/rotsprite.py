@@ -11,7 +11,9 @@ from pygame.locals import *
 from math import floor
 from animation import Animation
 
-__copyright__ = "Copyright 2011, Daladevelop"
+__author__    = "Christofer Odén"
+__credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
+__copyright__ = "Copyright 2011 Daladevelop"
 __license__   = "GPL"
 
 class RotSprite(Animation):
@@ -22,8 +24,6 @@ class RotSprite(Animation):
         slice_size = (self.frame_count / 360.0)
         index = int(floor(slice_size * (angle))) % self.frame_count
         return index
-
-
 
 if __name__ == "__main__":
     # Unit test

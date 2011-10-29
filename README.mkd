@@ -38,3 +38,4 @@ Contributors
 * spektral
 
 &copy; Daladevelop 2011
+Haven Core is licensed under [GPLv3](http://gnu.org/licenses/gpl.html)

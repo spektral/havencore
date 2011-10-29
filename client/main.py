@@ -6,13 +6,13 @@ Initializes and starts the game client.
 
 """
 
-__copyright__ = "Copyright 2011, Daladevelop"
-__license__   = "GPL"
-
 import os
 from gameengine import gameengine
 from vehicle import Vehicle
 from missile import Missile
+
+__copyright__ = "Copyright 2011, Daladevelop"
+__license__   = "GPL"
 
 def main():
     print(os.path.abspath("."))

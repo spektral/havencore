@@ -8,17 +8,17 @@
 #Gustav Fahlén, 2011-10-22
 #-------------------------------------
 
-__copyright__ = "Copyright 2011, Daladevelop"
-__license__   = "GPL"
-
-import json
 from math import floor, radians, sin, cos
+import json
 import pygame
 from pygame.locals import *
 from gameengine import gameengine
 from entity import Entity
 from missile import Missile
 
+__author__    = "Gustav Fahlén"
+__copyright__ = "Copyright 2011 Daladevelop"
+__license__   = "GPL"
 
 class Vehicle(Entity):
     def __init__(self, player, (x, y), rot):
@@ -90,7 +90,6 @@ class Vehicle(Entity):
         self.y += (self.vel * cos(radians(self.rot)))
 
     def fire(self):
-        print("Creating missile")
         missile = Missile(self.player, (self.x, self.y), 12, self.rot,
                           (32, 32), self)
         gameengine.add_entity(missile) 

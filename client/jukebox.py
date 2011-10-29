@@ -15,6 +15,10 @@ import glob
 import pygame
 from pygame.locals import * 
 
+__author__    = "Emil Österlund"
+__copyright__ = "Copyright 2011 Daladevelop"
+__license__   = "GPL"
+
 class JukeBox:
 	def __init__(self):
 		self.sound_path = 'client/sounds/'
