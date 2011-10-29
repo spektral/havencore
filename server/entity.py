@@ -18,6 +18,7 @@ class Entity(object):
     def __init__(self, player, (x, y), r):
         self.serial = Entity.ticker
         Entity.ticker += 1
+        self.age = 0
         self.player = player
         self.x = x
         self.y = y
@@ -26,11 +27,36 @@ class Entity(object):
         self.is_collidable = True
         self.alive = True
 
+    def update(self):
+        self.age += 1
+
     def get_state(self):
+
         """Return a dictionary representation of the instance."""
-        return { 'type': 'entity',
+
+        # Get the state of the object
+        state = { 'type': 'entity',
                  'name': self.__class__.__name__,
-                 'dict': self.__dict__ }
+                 'dict': dict(self.__dict__) }
+
+        # Weed out unnecessary fields
+        try:
+            del state['dict']['children']
+        except KeyError:
+            pass
+
+        try:
+            del state['dict']['parent']
+        except KeyError:
+            pass
+
+        try:
+            del state['dict']['collision_list']
+        except KeyError:
+            pass
+
+        print("%s.get_state() -> %s" % (self.__class__.__name__, state))
+        return state
 
     def check_collisions(self, entities):
         for entity in entities:

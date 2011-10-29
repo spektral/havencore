@@ -123,11 +123,11 @@ class GameEngine(object):
 
                 if name == 'Missile':
                     self.entities.append(
-                            Missile(dict), "client/img/missile.png", (40, 40))
+                            Missile(dict, "client/img/missile2.png", (32, 32)))
 
             # If the object doesn't exist, update it with the new data
             else:
-                entity = [o for o in self.entities if o.serial == serial][0]
+                entity = filter(lambda x:x.serial == serial, self.entities)[0]
                 entity.__dict__.update(dict)
 
         for entity in self.entities:
@@ -135,7 +135,8 @@ class GameEngine(object):
 
         self.jukebox.update()
 
-        #self.entities = [e for e in self.entities if e.alive == True]
+        self.entities = filter(lambda x:x.alive, self.entities)
+        print("%s.entities: %s" % (self.__class__.__name__, self.entities))
 
     def draw(self):
         """Draw stuff to the screen."""

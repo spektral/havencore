@@ -81,11 +81,13 @@ class GameEngine(object):
             entity.check_collisions(self.entities)
 
     def update(self):
-        """Perform game logic and weed out dead entities."""
+
+        """Weed out dead entities and update the rest."""
+
+        self.entities = filter(lambda x:x.alive, self.entities)
+
         for entity in self.entities:
             entity.update()
-
-        self.entities = [e for e in self.entities if e.alive == True]
 
     def handle_output(self):
         """Transmit the game state to the clients."""

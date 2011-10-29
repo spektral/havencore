@@ -100,8 +100,11 @@ class Vehicle(Entity):
         self.children.append(missile)
 
     def __repr__(self):
-        return ("(Vehicle, alive:%s rot:%.2f, vel:%.2f, (x%.2f, y%.2f))" %
-            (self.alive, self.rot, self.vel, self.x, self.y))
+        """Return a string representation of the instance."""
+        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
+                (self.__class__.__name__, self.alive, self.x, self.y,
+                    self.rot, self.vel))
+
 #
 #   Unit test procedure
 #

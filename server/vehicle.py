@@ -66,6 +66,8 @@ class Vehicle(Entity):
                 self.torque -= 5.0
 
     def update(self):
+        Entity.update(self)
+
         while self.collision_list:
             entity = self.collision_list.pop(0)
             if not entity in self.children \
@@ -88,6 +90,7 @@ class Vehicle(Entity):
         self.y += (self.vel * cos(radians(self.rot)))
 
     def fire(self):
+        print("Creating missile")
         missile = Missile(self.player, (self.x, self.y), 12, self.rot,
                           (32, 32), self)
         gameengine.add_entity(missile) 

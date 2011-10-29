@@ -16,15 +16,15 @@ __license__   = "GPL"
 
 from math import floor, radians, sin, cos
 from gameengine import gameengine
-import entity
+from entity import Entity
 
-class Missile(entity.Entity):
+class Missile(Entity):
 
     """Generic class for all projectiles in the game."""
 
     def __init__(self, player, (x, y), vel, rot, size, parent):
         """Initialize itself and it's base class."""
-        entity.Entity.__init__(self, player, (x, y), size[0] / 2)
+        Entity.__init__(self, player, (x, y), size[0] / 2)
         self.vel = vel
         self.rot = rot
         self.parent = parent
@@ -34,7 +34,15 @@ class Missile(entity.Entity):
         pass
 
     def update(self):
+
         """Do logic, react to collisions, move."""
+
+        print("%s.update()" % self.__class__.__name__)
+
+        Entity.update(self)
+        if self.age > 50:
+            self.alive = False
+
         for entity in self.collision_list:
             if entity is not self.parent:
                 self.alive = False
