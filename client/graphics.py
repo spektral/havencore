@@ -2,19 +2,25 @@
 # -*- coding: utf-8 -*-
 
 """
-Class for handling sprite animation.
+Module for purely visual stuff.
 
 """
+
+from math import floor
 
 import pygame
 from pygame.locals import *
 
-__author__    = "Christofer Odén"
+__credits__   = "Gustav Fahlén, Christofer Odén, Max Sidenstjärna"
 __credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
 __copyright__ = "Copyright 2011 Daladevelop"
 __license__   = "GPL"
 
+
 class Animation:
+
+    """Class for handling sprite animation"""
+
     def __init__(self, filename, frame_size, delay=0):
         self.current_frame = 0
         self.ticker = 0
@@ -74,38 +80,36 @@ class Animation:
                         (x - self.w / 2, y - self.h / 2))
 
 
+class RotSprite(Animation):
 
-#-------------------------------------------------------------------------------
-#   Unit test
-#-------------------------------------------------------------------------------
-if __name__ == "__main__":
-    pygame.init()
-    screen = pygame.display.set_mode((640, 480))
+    """Class for handling indexes of rotating sprites"""
 
-    # Create animation from the file with width and height 80
-    anim = Animation("img/explosion2.png", (64, 64), 2)
+    def set_direction(self, angle):
+        self.current_frame = self.angle_to_index(angle)
 
-    print("Frame count: %d" % anim.frame_count)
-    print("Frame size: (%d, %d)" % (anim.w, anim.h))
+    def angle_to_index(self, angle):
+        slice_size = (self.frame_count / 360.0)
+        index = int(floor(slice_size * (angle))) % self.frame_count
+        return index
 
-    is_running = True
-    direction = 0
-    while is_running:
-        # Rotate the animation 10 frames per second
-        anim.play()
 
-        screen.fill(pygame.Color(0, 0, 0))
+#class Explosion(Entity):
+#    def __init__(self, (x, y), filename, size, frame_delay):
+#        entity.Entity.__init__(self, (x, y), size[0] / 2)
+#        self.animation = animation.Animation(filename, size, frame_delay)
+#        self.animation.loop = False
+#        self.is_collidable = False
+#    
+#    def handle_input(self, event):
+#        pass
+#
+#    def update(self): 
+#        self.animation.update()
+#        if self.animation.finished == True:
+#            self.alive = False
+#
+#    def draw(self, screen):
+#        self.animation.draw(screen, self.x, self.y)
 
-        anim.update()
-        anim.draw(screen, 320, 240)
-
-        pygame.time.delay(20)
-        pygame.display.update()
-
-        # Quit on any key
-        for event in pygame.event.get():
-            if event.type == KEYDOWN or event.type == QUIT:
-                is_running = False
-                break
 
 # vim: ts=4 et tw=79 cc=+1

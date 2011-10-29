@@ -10,7 +10,6 @@ import logging
 import argparse
 import os
 import time
-from server.vehicle import Vehicle
 from server.gameengine import gameengine as serverengine
 from client.gameengine import gameengine as clientengine
 

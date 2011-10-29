@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pygame 
 from defines import *
-from entity import Entity
+from entities import Entity
 
 """
 Generic class for all projectiles in the game.
