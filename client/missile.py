@@ -14,26 +14,30 @@
 __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
 
+from math import floor, radians, sin, cos
 import pygame
 import explosion
 import entity
 import rotsprite
-from gameengine import gameengine
-from math import floor, radians, sin, cos
 
 class Missile(entity.Entity):
+
     """
     Generic class for all projectiles in the game.
 
     """
-    def __init__(self, (x, y), vel, rot, filename, size, parent):
-        entity.Entity.__init__(self, (x, y), size[0] / 2)
-        self.vel = vel
-        self.rot = rot
-        self.parent = parent
-        
-        self.unit = rotsprite.RotSprite(filename, size)
-        self.unit.set_direction(self.rot)
+
+    def __init__(self, dict):
+        self.__dict__ = dict
+
+#    def __init__(self, (x, y), vel, rot, filename, size, parent):
+#        entity.Entity.__init__(self, (x, y), size[0] / 2)
+#        self.vel = vel
+#        self.rot = rot
+#        self.parent = parent
+#        
+#        self.unit = rotsprite.RotSprite(filename, size)
+#        self.unit.set_direction(self.rot)
 
     def handle_input(self, event):
         pass

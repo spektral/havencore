@@ -16,6 +16,9 @@ from pygame.locals import *
 from defines import *
 from jukebox import JukeBox
 from mapHandler import MapHandler
+import connection
+from vehicle import Vehicle
+from missile import Missile
 
 class GameEngine(object):
 
@@ -28,19 +31,20 @@ class GameEngine(object):
     
     """
 
-    def initialize(self, port):
+    def initialize(self, username, addr):
         """Initialize the game engine with screen resolution."""
-        logging.getLogger(__name__)
         logging.info("Initializing client engine...")
+
         logging.info("Initializing pygame...")
         pygame.init()
-        self.mapHandler = MapHandler(WIDTH,HEIGHT,40)
-        self.entities = []
-        self.jukebox = JukeBox()
-
-        logging.info("Setting up video mode...")
         self.screen = pygame.display.set_mode((800, 600))
-        pygame.display.set_caption("pybattle")
+        pygame.display.set_caption("Haven Core")
+
+        self.username = username
+        self.connection = connection.Connection(addr)
+        self.mapHandler = MapHandler(WIDTH, HEIGHT, 40)
+        self.jukebox = JukeBox()
+        self.entities = []
 
     def add_entity(self, entity):
         """Append a game object to the object list."""
@@ -49,12 +53,13 @@ class GameEngine(object):
     def start(self):
         """Start the game engine."""
         logging.info("Starting client engine...")
+        self.connection.establish()
         self.fps_clock = pygame.time.Clock()
 
         self.is_running = True
         while(self.is_running):
             self.handle_input()
-            self.update()
+            self.get_server_state()
             self.draw()
             self.fps_clock.tick(50)
 
@@ -62,10 +67,13 @@ class GameEngine(object):
         logging.info("Stopping client engine...")
         self.is_running = False
     
-    # Better name "handle_events"
     def handle_input(self):
+
         """Take input from the user and check for other events like
         collisions."""
+
+        event_pack = { 'player': self.username, 'events': [] }
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 self.quit()
@@ -76,22 +84,58 @@ class GameEngine(object):
                     self.quit()
                     break
 
-            for entity in self.entities:
-                entity.handle_input(event)
-                self.mapHandler.handle_input(event)
+            net_event = { 'type': event.type }
 
-        for entity in self.entities:
-            entity.check_collisions(self.entities)
+            if event.type in (KEYDOWN, KEYUP):
+                net_event['key'] = event.key
+                event_pack['events'].append(net_event)
 
-    def update(self):
-        """Tell all objects to perform their logic. Weed out dead
-        objects."""
+        logging.debug("Event package: %s" % event_pack)
+        if event_pack['events']:
+            self.connection.transmit(event_pack)
+            
+            #for entity in self.entities:
+            #    entity.handle_input(event)
+            #    self.mapHandler.handle_input(event)
+
+        #for entity in self.entities:
+        #    entity.check_collisions(self.entities)
+
+    def get_server_state(self):
+
+        """Get state from server and update the known entities."""
+
+        state = self.connection.get_server_state()
+        print("Received: %s" % state)
+
+        for input in state:
+            serial = input['dict']['serial']
+            name = input['name']
+            dict = input['dict']
+
+            # Create objects that doesn't exist yet
+            if (serial not in [s.serial for s in self.entities]):
+
+                if name == 'Vehicle':
+                    self.entities.append(
+                            Vehicle(dict, "client/img/crawler_sprites.png",
+                                (128, 128)))
+
+                if name == 'Missile':
+                    self.entities.append(
+                            Missile(dict), "client/img/missile.png", (40, 40))
+
+            # If the object doesn't exist, update it with the new data
+            else:
+                entity = [o for o in self.entities if o.serial == serial][0]
+                entity.__dict__.update(dict)
+
         for entity in self.entities:
             entity.update()
 
         self.jukebox.update()
 
-        self.entities = [e for e in self.entities if e.alive == True]
+        #self.entities = [e for e in self.entities if e.alive == True]
 
     def draw(self):
         """Draw stuff to the screen."""
@@ -99,6 +143,7 @@ class GameEngine(object):
         self.mapHandler.draw(self.screen)
 
         for entity in self.entities:
+            print(entity)
             entity.draw(self.screen)
 
         pygame.display.update()

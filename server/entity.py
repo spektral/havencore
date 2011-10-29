@@ -1,19 +1,24 @@
 #!/usr/bin/python2 -tt
 # -*- coding: utf-8 -*-
 
-"""
-Abstract base class for a common interface to all game objects.
-
-"""
-
 __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
 
+import unittest
 import pygame
 import math
 
 class Entity(object):
-    def __init__(self, (x, y), r):
+
+    """Abstract base class for data belonging to all kinds of of game
+    objects."""
+
+    ticker = 0
+
+    def __init__(self, player, (x, y), r):
+        self.serial = Entity.ticker
+        Entity.ticker += 1
+        self.player = player
         self.x = x
         self.y = y
         self.r = r
@@ -21,15 +26,11 @@ class Entity(object):
         self.is_collidable = True
         self.alive = True
 
-    def handle_input(self, event):
-        raise NotImplementedError("Not implemented")
-
-    def update(self):
-        raise NotImplementedError("Not implemented")
-
     def get_state(self):
         """Return a dictionary representation of the instance."""
-        return { '__%s__' % self.__class__.__name__: self.__dict__ }
+        return { 'type': 'entity',
+                 'name': self.__class__.__name__,
+                 'dict': self.__dict__ }
 
     def check_collisions(self, entities):
         for entity in entities:
@@ -41,11 +42,20 @@ class Entity(object):
                     self.collision_list.append(entity)
 
 
+class Test(unittest.TestCase):
+    def setUp(self):
+        self.entities = []
+        self.entities.append(Entity('0', (0, 0), 20))
+        self.entities.append(Entity('1', (0, 0), 20))
+        self.entities.append(Entity('2', (0, 0), 20))
 
-#
-#   Unit test procedure
-#
+    def test_serial(self):
+        self.assertEqual(self.entities[0].serial, 0)
+        self.assertEqual(self.entities[1].serial, 1)
+        self.assertEqual(self.entities[2].serial, 2)
+        self.assertEqual(Entity.ticker, 3)
+
 if __name__ == "__main__":
-    entity = Entity()
+    unittest.main()
 
 # vim: ts=4 et tw=79 cc=+1

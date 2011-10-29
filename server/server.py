@@ -28,12 +28,7 @@ class Server:
         self.sock.listen(5)
 
     def get_input(self):
-        """Read input from the network and return a list of it.
-
-        The resulting list of inputs is constructed as:
-        [ {'owner': (host, port), 'events': [ pygame.event, ... ] }, ... ]
-
-        """
+        """Read input from the network and return a list of it."""
         inputs = []
         read_list = [self.sock] + self.clients
 
@@ -44,13 +39,24 @@ class Server:
                 self.clients.append(client)
                 logging.info("%s:%s connected." % addr)
             else:
-                data, addr = s.recvfrom(4096)
+                try:
+                    data, addr = s.recvfrom(4096)
+                    print("Input data '%s' from %s" % (data, addr))
+                except IOError as e:
+                    logging.info(e)
+                    if e.errno == 104:
+                        print("Removing client %s" % s)
+                        self.clients.remove(s)
+                    continue
+
                 if data:
                     try:
-                        inputs += { 'owner': addr, 'events': json.loads(data) }
+                        inputs.append(json.loads(data))
+                        print("Inputs: %s" % inputs)
                     except ValueError:
                         pass
                 else:
+                    print("Client %s disconnected." % s)
                     logging.info("Client disconnected.")
                     s.close()
                     self.clients.remove(s)
@@ -60,7 +66,8 @@ class Server:
     def transmit(self, data):
         """Send the game state to all clients."""
         send_list = self.clients
-        msg = zlib.compress(json.dumps(data, separators=(',',':')))
+        #msg = zlib.compress(json.dumps(data, separators=(',',':')))
+        msg = json.dumps(data, separators=(',',':'))
 
         readable, writable, in_error = select.select([], send_list, [], 0)
         for s in writable:

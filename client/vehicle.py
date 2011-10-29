@@ -11,39 +11,41 @@
 __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
 
+from math import floor, radians, sin, cos
 import pygame
 from pygame.locals import *
-from math import floor, radians, sin, cos
-from gameengine import gameengine
 from entity import Entity
 from missile import Missile
 from rotsprite import RotSprite
 from explosion import Explosion
 
 class Vehicle(Entity):
-    def __init__(self, (x, y), rot):
-        Entity.__init__(self, (x, y), 40)
-        self.rot = rot
-        self.torque = 0
-        self.vel = 0
-        self.sprite = RotSprite("client/img/crawler_sprites.png", (128,128))
-        self.health = 100
-        self.children = []
-        gameengine.jukebox.load_sound('rocket.ogg','rocket')
+    def __init__(self, dict, filename, size):
+        self.__dict__ = dict
+        self.sprite = RotSprite(filename, (128,128))
+
+#    def __init__(self, (x, y), rot):
+#        Entity.__init__(self, (x, y), 40)
+#        self.rot = rot
+#        self.torque = 0
+#        self.vel = 0
+#        self.health = 100
+#        self.children = []
+#        gameengine.jukebox.load_sound('rocket.ogg','rocket')
 
     def handle_input(self, event):
         if event.type == KEYDOWN:
             if event.key == K_UP:
-                self.vel += 5.0
+                self.vel += 2.0
 
             if event.key == K_DOWN:
-                self.vel -= 5.0
+                self.vel -= 2.0
 
             if event.key == K_RIGHT:
-                self.torque -= 5.0
+                self.torque -= 2.0
 
             if event.key == K_LEFT:
-                self.torque += 5.0
+                self.torque += 2.0
 
             if event.key == K_SPACE:
                 self.fire()
@@ -51,26 +53,25 @@ class Vehicle(Entity):
 
         elif event.type == KEYUP:
             if event.key == K_UP:
-                self.vel -= 5.0
+                self.vel -= 2.0
 
             if event.key == K_DOWN:
-                self.vel += 5.0
+                self.vel += 2.0
 
             if event.key == K_RIGHT:
-                self.torque += 5.0
+                self.torque += 2.0
 
             if event.key == K_LEFT:
-                self.torque -= 5.0
+                self.torque -= 2.0
 
     def update(self):
-        while self.collision_list:
-            entity = self.collision_list.pop(0)
-            if not entity in self.children \
-                    and isinstance(entity, Missile):
-                self.health -= 40
+#        while self.collision_list:
+#            entity = self.collision_list.pop(0)
+#            if not entity in self.children \
+#                    and isinstance(entity, Missile):
+#                self.health -= 40
 
-        self.children = [c for c in self.children if c.alive]
-
+#        self.children = [c for c in self.children if c.alive]
 
         if self.health <= 0:
             self.health = 0

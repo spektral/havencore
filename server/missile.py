@@ -22,9 +22,9 @@ class Missile(entity.Entity):
 
     """Generic class for all projectiles in the game."""
 
-    def __init__(self, (x, y), vel, rot, size, parent):
+    def __init__(self, player, (x, y), vel, rot, size, parent):
         """Initialize itself and it's base class."""
-        entity.Entity.__init__(self, (x, y), size[0] / 2)
+        entity.Entity.__init__(self, player, (x, y), size[0] / 2)
         self.vel = vel
         self.rot = rot
         self.parent = parent

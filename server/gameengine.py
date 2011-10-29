@@ -6,6 +6,7 @@ __license__   = "GPL"
 
 import logging
 import pygame
+from pygame.locals import *
 from server import Server 
 
 class GameEngine(object):
@@ -39,7 +40,6 @@ class GameEngine(object):
 
     def initialize(self, port):
         """Create the server object and an empty entity list."""
-        logging.getLogger(__name__)
         logging.info("Initializing server engine...")
         self.server = Server(port)
         self.entities = []
@@ -68,11 +68,14 @@ class GameEngine(object):
 
     def handle_input(self):
         """Propagate network input and handle collisions."""
-        for inp in self.server.get_input():
+        for input in self.server.get_input():
             for entity in self.entities:
-                if entity.owner == inp['owner']:
-                    for event in event['events']:
-                        entity.handle_event(event)
+                if entity.player == input['player']:
+                    for event in input['events']:
+                        if event['type'] in (KEYDOWN, KEYUP):
+                            e = pygame.event.Event(event['type'],
+                                             { 'key': event['key'] })
+                            entity.handle_input(e)
 
         for entity in self.entities:
             entity.check_collisions(self.entities)
@@ -86,7 +89,8 @@ class GameEngine(object):
 
     def handle_output(self):
         """Transmit the game state to the clients."""
-        self.server.transmit(self.entities)
+        net_package = [x.get_state() for x in self.entities]
+        self.server.transmit(net_package)
 
     def __repr__(self):
         return self.entities

@@ -21,8 +21,8 @@ from missile import Missile
 
 
 class Vehicle(Entity):
-    def __init__(self, (x, y), rot):
-        Entity.__init__(self, (x, y), 40)
+    def __init__(self, player, (x, y), rot):
+        Entity.__init__(self, player, (x, y), 40)
         self.rot = rot
 
         self.torque = 0
@@ -33,6 +33,9 @@ class Vehicle(Entity):
         self.children = []
 
     def handle_input(self, event):
+        #print("%s.handle_input(%s)" % (self.__class__.__name__,
+        #                               event))
+        #print("%s.player=%s" % (self.__class__.__name__, self.player))
         if event.type == KEYDOWN:
             if event.key == K_UP:
                 self.vel += 5.0
@@ -85,8 +88,7 @@ class Vehicle(Entity):
         self.y += (self.vel * cos(radians(self.rot)))
 
     def fire(self):
-        missile = Missile((self.x, self.y), 12, self.rot,
-                "img/missile2.png", (32, 32), self)
+        missile = Missile((self.x, self.y), 12, self.rot, (32, 32), self)
         gameengine.add_entity(missile) 
         self.children.append(missile)
 
