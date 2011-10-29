@@ -37,4 +37,4 @@ Contributors
 * mrhenko
 * spektral
 
-&copy Daladevelop 2011
+&copy; Daladevelop 2011
