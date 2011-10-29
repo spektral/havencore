@@ -59,7 +59,7 @@ class GameEngine(object):
             self.handle_input()
             self.update()
             self.handle_output()
-            self.fps_clock.tick(30)
+            self.fps_clock.tick(50)
 
     def quit(self):
         """Break the main game loop."""

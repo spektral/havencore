@@ -1,0 +1,40 @@
+Haven Core
+==========
+
+Background
+----------
+The surface is a barren wasteland, and the unforgiving corrosive atmosphere
+has forced the living below ground.  As resources are rare, and the demand for
+energy is high, rough necked individuals make their living as surface miners
+aboard *crawler machines*.  These machines are equipped with *haven cores* to
+protect them from the hazardous environment, but they require a steady flow of
+energy, and you don't want a powerout.
+
+The surface miners are a special breed.  You never know what drives a person on
+board these crafts.  Is it greed?  Necessity?  Maybe a lust for adventure and
+glory?  Or perhaps, a deep longing for a sky above your head, no matter how
+toxic.
+
+As a captain on board one of these huge machines,  you roam the surface in
+pursuit of minerals and energy crystals.  So get ready, pick out a perfect crew,
+or rather, try to force the local riff-raff on board, load up on guns and ammo,
+and never forget to keep your haven core online at all times.
+
+Contribute
+----------
+Anyone is welcome to join in the development, coding is just a small part, if
+you can wield pixels or track music, or in any other way contribute to the
+project, fell free to send us a message if you want to join in on the fun. 
+We usually hang around in the #esec channel on the freenode IRC server, or
+@daladevelop on twitter.
+
+Contributors
+------------
+* eco37
+* Fennec89
+* larsemil
+* madbearz
+* mrhenko
+* spektral
+
+&copy Daladevelop 2011

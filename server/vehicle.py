@@ -88,7 +88,8 @@ class Vehicle(Entity):
         self.y += (self.vel * cos(radians(self.rot)))
 
     def fire(self):
-        missile = Missile((self.x, self.y), 12, self.rot, (32, 32), self)
+        missile = Missile(self.player, (self.x, self.y), 12, self.rot,
+                          (32, 32), self)
         gameengine.add_entity(missile) 
         self.children.append(missile)
 
