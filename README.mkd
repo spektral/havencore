@@ -35,7 +35,8 @@ Contributors
 * [larsemil](http://larsemil.se) [emomilol](http://twitter.com/emomilol)
 * madbearz
 * mrhenko
-* spektral
+* Christofer Odén <bei.oden@gmail.com>
+  [@theSpektre](http://twitter.com/theSpektre)
 
 &copy; Daladevelop 2011
 
