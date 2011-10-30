@@ -32,7 +32,7 @@ Contributors
 ------------
 * eco37
 * Fennec89
-* larsemil
+* [larsemil](http://larsemil.se) [emomilol](http://twitter.com/emomilol)
 * madbearz
 * mrhenko
 * spektral
