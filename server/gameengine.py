@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python2 -tt
 # -*- coding: utf-8 -*-
 
 import sys
@@ -27,13 +27,13 @@ class Server:
     """
 
     BUFSIZE = 65536
-    use_compression = False
+    use_compression = True
 
     def __init__(self, port):
 
         """Initialize the server"""
 
-        self.logger = logging.getLogger('gameengine.Server')
+        self.logger = logging.getLogger('server.gameengine.Server')
 
         self.port = port
 
@@ -60,6 +60,13 @@ class Server:
 
         """Pack and transmit data to a remote host"""
 
+        try:
+            data = json.dumps(data, separators=(',',':'))
+        except:
+            self.logger.error("Data could not be JSON coded")
+            self.logger.debug("Data causing error:\n%s" % data)
+            return
+
         if self.use_compression:
             try:
                 data = zlib.compress(data)
@@ -67,13 +74,6 @@ class Server:
                 self.logger.error("Data could not be zlib compressed")
                 self.logger.debug("Data causing error:\n%s" % data)
                 return
-
-        try:
-            data = json.dumps(data, separators=(',',':'))
-        except:
-            self.logger.error("Data could not be JSON coded")
-            self.logger.debug("Data causing error:\n%s" % data)
-            return
 
         bytes_sent = socket.send(data)
         if not bytes_sent == len(data):

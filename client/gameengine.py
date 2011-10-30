@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python2 -tt
 # -*- coding: utf-8 -*-
 
 """
@@ -39,13 +39,13 @@ class Connection:
     """
 
     BUFSIZE = 65536
-    use_compression = False
+    use_compression = True
 
     def __init__(self, username, addr):
 
         """Initialize the server"""
 
-        self.logger = logging.getLogger('gameengine.Connection')
+        self.logger = logging.getLogger('client.gameengine.Connection')
 
         self.username = username
 
@@ -73,7 +73,6 @@ class Connection:
             self.logger.debug("Data causing error:\n%s" % response)
             sys.exit(1)
 
-        self.logger.debug("Server response to connect: %s" % response)
         if response['accepted'] == False:
             self.logger.critical("Connection failed: %s" % response['reason'])
         else:
@@ -83,6 +82,13 @@ class Connection:
 
         """Pack and transmit data to a remote host"""
 
+        try:
+            data = json.dumps(data, separators=(',',':'))
+        except:
+            self.logger.error("Data could not be JSON coded")
+            self.logger.debug("Data causing error:\n%s" % data)
+            return
+
         if self.use_compression:
             try:
                 data = zlib.compress(data)
@@ -90,13 +96,6 @@ class Connection:
                 self.logger.error("Data could not be zlib compressed")
                 self.logger.debug("Data causing error:\n%s" % data)
                 return
-
-        try:
-            data = json.dumps(data, separators=(',',':'))
-        except:
-            self.logger.error("Data could not be JSON coded")
-            self.logger.debug("Data causing error:\n%s" % data)
-            return
 
         bytes_sent = self.socket.send(data)
         if not bytes_sent == len(data):
@@ -248,10 +247,12 @@ class GameEngine(object):
 
         state = self.connection.get_state()
         if state:
+            self.entities = []
+
             for input in state:
-                serial = input['dict']['serial']
                 name = input['name']
                 dict = input['dict']
+                serial = dict['serial']
 
                 # Create objects that doesn't exist yet
                 if (serial not in [s.serial for s in self.entities]):

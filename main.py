@@ -22,7 +22,7 @@ def start_singleplayer(name, addr):
         serverengine.initialize(addr[1])
         serverengine.start()
     else:
-        time.sleep(0.1)
+        time.sleep(0.2)
         clientengine.initialize(name, addr)
         clientengine.start()
 
