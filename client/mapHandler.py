@@ -8,6 +8,8 @@ from defines import *
 from blockentity import BlockEntity
 #from filehandler import *
 
+
+
 class MapHandler:
     def __init__(self,width, height, blockSize):
         self.screen = 0
@@ -33,39 +35,34 @@ class MapHandler:
            #    self.blockList.append(BlockEntity((i*self.blockSize, j*self.blockSize), 0, 0, "", self.blockSize, None):
     def handle_input(self,event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            self.start = self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
-        
+            #self.start = self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
+            
+            self.get_block_at(pygame.mouse.get_pos()).set_color(black)
+            #paint all colliding.
+            #collider =self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
+            #collider.check_collisions(self.blockList)
+            #for colliding in collider.collision_list:
+            #    colliding.set_color(red)
+
        
-        if event.type == pygame.MOUSEBUTTONUP:
-            self.end = self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
-            self.calc_path(self.start, self.end)
+        #if event.type == pygame.MOUSEBUTTONUP:
+            #self.end = self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
+            #self.calc_path(self.start, self.end)
 
     def clear(self):
         self.blockList = []
-        self.initBlockList()
-        selfinit_adjacent()
+        self.init_blockList()
+        self.init_adjacent()
         self.changed = self.blockList
     def init_adjacent(self):
-        minIndex = 0
-        maxIndex = self.height/self.blockSize * self.width/self.blockSize
-        for block in self.blockList:
-            #DOWN
-            if self.get_block_index((block.x, block.y+self.blockSize)) < maxIndex:
-                block.addAdjacent(self.blockList[self.get_block_index((block.x, block.y+self.blockSize))])
-            #UP
-            if self.get_block_index((block.x, block.y-self.blockSize)) >= minIndex:
-                block.addAdjacent(self.blockList[self.get_block_index((block.x, block.y-self.blockSize))])
-            #LEFT
-            if self.get_block_index((block.x-self.blockSize, block.y)) > minIndex and block.x/self.blockSize > 0 :
-                block.addAdjacent(self.blockList[self.get_block_index((block.x-self.blockSize, block.y))])
-            #RIGHT
-            if self.get_block_index((block.x+self.blockSize, block.y)) < maxIndex and block.x+self.blockSize < self.width:
-                block.addAdjacent(self.blockList[self.get_block_index((block.x+self.blockSize, block.y))])
-            if len(block.getAdjacentList()) == 0:
-                block.setAdjacentList(None)
-            # DIAGONAL?
-            
-
+      #  for block in self.blockList:
+            #block.check_collisions(self.blockList)
+           # block.set_adjacent_list(block.get_colliders())
+        print "wtf.."
+    def get_block_at(self,i):
+            return self.blockList[i]
+    def get_block_at(self, (x,y)):
+            return self.blockList[self.get_block_index((x,y))]
     def get_block_index(self, (x,y)): 
         return ((y/self.blockSize)*(self.width/self.blockSize)) + (x/self.blockSize)# +( y/self.blockSize)
        
@@ -85,11 +82,11 @@ class MapHandler:
     def draw(self, screen):
         # HACK
         self.screen = screen
-        self.random_fill()
+        #self.random_fill()
      
         self.draw_board(screen)
         # this will n
-        for c in self.changed: 
+        for c in self.blockList: 
             c.draw(screen)
         self.changed = []
     def update_all(self):
@@ -113,8 +110,6 @@ class MapHandler:
         self.changed.append(self.blockList[i])
         self.blockList[i].setColor(color)
     
-    def get_block_at(self,i):
-            return self.blockList[i]
     def get_width(self):
         return self.width
     def get_height(self):
@@ -123,6 +118,8 @@ class MapHandler:
         return self.blockSize
     def get_block_list(self):    
         return self.blockList
+    def is_walkable(self, (x,y)):
+        return self.get_block_at(self.get_block_index(x,y)).is_walkable()
     #def saveMap(self, filename):
     #    f = FileHandler()
     #    f.writeList(filename, self.blockList)
@@ -138,12 +135,12 @@ class MapHandler:
     # AS A LIST OF BLOCKS!
     # (ATM WE CANT GO DIAGONAL)
     def calc_path(self, startBlock, endBlock):
-        if endBlock.isWalkable() == 0:
+        if endBlock.is_walkable() == 0:
             return None
         self.closedList = []
         self.openList = []
         self.beforeList = list(self.blockList) #save the old list...
-        endBlock.setColor(pink)
+        endBlock.set_color(pink)
         s = startBlock
         #self.openList.append(startBlock) 
         tid = time.clock()
@@ -158,17 +155,17 @@ class MapHandler:
         while t != s:
             if t == None:
                 return t
-            t.setColor(pink)
+            t.set_color(pink)
             illuList.append(t)
             t = t.getParent()
             
-        s.setColor(pink)
+        s.set_color(pink)
         illuList.append(s)
         illuList.reverse()
         for block in illuList:
              block.draw(self.screen)
              pygame.display.flip()
-             time.sleep(self.delay)
+             #time.sleep(self.delay)
              
         return i
     
@@ -198,10 +195,10 @@ class MapHandler:
             
             closedList.append(x)
             openList.remove(x)
-            self.calc_heuristic(x.getAdjacentList(),endBlock)
-            for block in x.getAdjacentList():
+            self.calc_heuristic(x.get_adjacent_list(),endBlock)
+            for block in x.get_adjacent_list():
                 
-                if block in closedList or block.isWalkable() == 0:
+                if block in closedList or block.is_walkable() == 0:
                     continue
                 tentativeG = block.getG()+x.getG() # 10pts for the move
                 better = False
@@ -213,7 +210,7 @@ class MapHandler:
                 if better == True:
                     block.setParent(x)
                     block.setG(tentativeG)
-                    block.setH(self.calc_manhattan(block,endBlock))
+                    block.set_h(self.calc_manhattan(block,endBlock))
                     block.setF(block.getG()+block.getH())
       
         
@@ -223,7 +220,7 @@ class MapHandler:
     
     def calc_heuristic(self, blockSet, endBlock):
         for block in blockSet:
-            block.setH(self.calc_manhattan(block, endBlock))
+            block.set_h(self.calc_manhattan(block, endBlock))
             
     # CALC H THE MANHATTAN WAY
     def calc_manhattan(self, startBlock, endBlock):
@@ -264,4 +261,4 @@ class MapHandler:
         
         
 
-# vim: ts=4 et tw=79 cc=+1
+# vim: ts=4 et tw=79 cc=79 

@@ -8,7 +8,7 @@ pink = [255,105,180]
 BLOCKSIZE = 32
 WIDTH = 800
 HEIGHT = 600
-DELAY = 0
+DELAY = 2
 
 colorList = [ black, white, red, green , blue ]
 

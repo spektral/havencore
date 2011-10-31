@@ -131,7 +131,7 @@ class GameEngine(object):
 
         self.username = username
         self.connection = Connection(username, addr)
-        self.mapHandler = MapHandler(WIDTH, HEIGHT, 40)
+        self.mapHandler = MapHandler(1024, 768, 40)
         self.entities = []
 
     def add_entity(self, entity):
