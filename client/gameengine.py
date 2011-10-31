@@ -21,7 +21,7 @@ from common import net
 from entities import *
 
 from defines import *
-from jukebox import JukeBox
+from jukebox import jukebox
 from mapHandler import MapHandler
 
 __author__    = "Gustav Fahlén, Christofer Odén, Max Sidenstjärna"
@@ -80,63 +80,6 @@ class Connection:
         else:
             self.logger.info("Connected")
 
-#    def send(self, data):
-#
-#        """Pack and transmit data to a remote host"""
-#
-#        try:
-#            data = json.dumps(data, separators=(',',':'))
-#        except:
-#            self.logger.error("Data could not be JSON coded")
-#            self.logger.debug("Data causing error:\n%s" % data)
-#            return
-#
-#        if self.use_compression:
-#            try:
-#                data = zlib.compress(data)
-#            except:
-#                self.logger.error("Data could not be zlib compressed")
-#                self.logger.debug("Data causing error:\n%s" % data)
-#                return
-#
-#        bytes_sent = self.socket.send(data)
-#        if not bytes_sent == len(data):
-#            self.logger.error("Could not send all data")
-
-#    def receive(self):
-#
-#        """Receive and unpack data from a remote host"""
-#
-#        try:
-#            data = self.socket.recv(self.BUFSIZE)
-#        except IOError as e:
-#            # There might be an IOError which should not lead to disconnect.
-#            #if not e.errno == xxx:
-#            self.logger.critical("Error receiving data: %s" % e)
-#            sys.exit(1)
-#
-#        if not data:
-#            self.logger.critical("Remote host disconnected")
-#            sys.exit(1)
-#
-#        if self.use_compression == True:
-#            try:
-#                data = zlib.decompress(data)
-#            except:
-#                self.logger.error("Data could not be zlib decompressed")
-#                self.logger.debug("Data causing error:\n%s" % data)
-#                return None
-#
-#        try:
-#            data = json.loads(data)
-#        except:
-#            self.logger.error("Data could not be JSON decoded")
-#            self.logger.debug("Data causing error:\n%s" % data)
-#            return None
-#
-#        else:
-#            return data
-
     def get_state(self):
 
         """Parse server state messages and return a list of it"""
@@ -184,10 +127,11 @@ class GameEngine(object):
         self.screen = pygame.display.set_mode((1024, 768))
         pygame.display.set_caption("Haven Core")
 
+        jukebox.initialize()
+
         self.username = username
         self.connection = Connection(username, addr)
         self.mapHandler = MapHandler(WIDTH, HEIGHT, 40)
-        self.jukebox = JukeBox()
         self.entities = []
 
     def add_entity(self, entity):
@@ -247,13 +191,13 @@ class GameEngine(object):
         """Get state from server and update the known entities."""
 
         state_list = self.connection.get_state()
-        self.logger.debug("State List: %s" % state_list)
-        if state_list:
-            self.entities = []
+        #self.logger.debug("State List: %s" % state_list)
+        #if state_list:
+            #self.entities = []
 
         for state in state_list:
             for entity in state:
-                self.logger.debug("State: %s" % state)
+                #self.logger.debug("State: %s" % state)
                 name = entity['name']
                 dict = entity['dict']
                 serial = dict['serial']
@@ -270,6 +214,7 @@ class GameEngine(object):
                         self.entities.append(
                                 Missile(dict, "client/img/missile2.png",
                                         (32, 32)))
+                        jukebox.play_sound('rocket')
 
                 # If the object exists, update it with the new data
                 else:
@@ -280,7 +225,7 @@ class GameEngine(object):
         for entity in self.entities:
             entity.update()
 
-        self.jukebox.update()
+        jukebox.update()
 
         self.entities = filter(lambda x:x.alive, self.entities)
 

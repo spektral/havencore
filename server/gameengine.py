@@ -126,11 +126,11 @@ class Server:
         for message in filter(lambda m:m['label'] == 'events', messages):
             events += message['events']
 
-        self.logger.debug("Events: %s" % events)
+        #self.logger.debug("Events: %s" % events)
 
         event_list = []
         for event in events:
-            self.logger.debug("Event: %s" % event)
+            #self.logger.debug("Event: %s" % event)
             if 'type' not in event:
                 self.logger.error("Malformed event")
                 self.logger.debug("Event causing error:\n%s" % event)

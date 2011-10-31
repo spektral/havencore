@@ -93,23 +93,4 @@ class RotSprite(Animation):
         return index
 
 
-#class Explosion(Entity):
-#    def __init__(self, (x, y), filename, size, frame_delay):
-#        entity.Entity.__init__(self, (x, y), size[0] / 2)
-#        self.animation = animation.Animation(filename, size, frame_delay)
-#        self.animation.loop = False
-#        self.is_collidable = False
-#    
-#    def handle_input(self, event):
-#        pass
-#
-#    def update(self): 
-#        self.animation.update()
-#        if self.animation.finished == True:
-#            self.alive = False
-#
-#    def draw(self, screen):
-#        self.animation.draw(screen, self.x, self.y)
-
-
 # vim: ts=4 et tw=79 cc=+1

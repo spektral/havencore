@@ -25,7 +25,7 @@ def send(socket, message, username='server'):
 
     message = { 'username': username, 'message': message }
 
-    logger.debug("Sending: %s" % message.__repr__())
+    #logger.debug("Sending: %s" % message.__repr__())
 
     try:
         message = json.dumps(message, separators=(',',':'))
@@ -77,7 +77,7 @@ def receive(socket):
         logger.error("%s: %s" % (e.__class__.__name__, e))
         raise IOError(0, "json.loads failed")
 
-    logger.debug("Received: %s" % messages)
+    #logger.debug("Received: %s" % messages)
 
     if not 'username' in messages[0]:
         raise Exception("Message list did not contain username")
