@@ -75,12 +75,15 @@ class Vehicle(Entity):
 
     """Generic class for all types of vehicles in the game"""
 
+    maxvel = 10.0
+
     def __init__(self, player, (x, y), rot):
         Entity.__init__(self, player, (x, y), 40)
         self.rot = rot
 
         self.torque = 0
         self.vel = 0
+        self.strafe = 0
 
         self.health = 100
 
@@ -88,33 +91,45 @@ class Vehicle(Entity):
 
     def handle_input(self, event):
         if event.type == KEYDOWN:
-            if event.key == K_UP:
-                self.vel += 5.0
+            if event.key == K_w:
+                self.vel += self.maxvel
 
-            if event.key == K_DOWN:
-                self.vel -= 5.0
+            if event.key == K_s:
+                self.vel -= self.maxvel
 
-            if event.key == K_RIGHT:
-                self.torque -= 5.0
+            if event.key == K_d:
+                self.strafe -= self.maxvel
+
+            if event.key == K_a:
+                self.strafe += self.maxvel
 
             if event.key == K_LEFT:
-                self.torque += 5.0
+                self.torque += self.maxvel / 2.0
+
+            if event.key == K_RIGHT:
+                self.torque -= self.maxvel / 2.0
 
             if event.key == K_SPACE:
                 self.fire()
 
         elif event.type == KEYUP:
-            if event.key == K_UP:
-                self.vel -= 5.0
+            if event.key == K_w:
+                self.vel -= self.maxvel
 
-            if event.key == K_DOWN:
-                self.vel += 5.0
+            if event.key == K_s:
+                self.vel += self.maxvel
 
-            if event.key == K_RIGHT:
-                self.torque += 5.0
+            if event.key == K_d:
+                self.strafe += self.maxvel
+
+            if event.key == K_a:
+                self.strafe -= self.maxvel
 
             if event.key == K_LEFT:
-                self.torque -= 5.0
+                self.torque -= self.maxvel / 2.0
+
+            if event.key == K_RIGHT:
+                self.torque += self.maxvel / 2.0
 
     def update(self):
         Entity.update(self)
@@ -139,6 +154,8 @@ class Vehicle(Entity):
 
         self.x += (self.vel * sin(radians(self.rot)))
         self.y += (self.vel * cos(radians(self.rot)))
+        self.x += (self.strafe * sin(radians(self.rot + 90.0)))
+        self.y += (self.strafe * cos(radians(self.rot + 90.0)))
 
     def fire(self):
         missile = Missile(self.player, (self.x, self.y), 12, self.rot,

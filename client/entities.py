@@ -61,36 +61,36 @@ class Vehicle(Entity):
 #        self.children = []
 #        gameengine.jukebox.load_sound('rocket.ogg','rocket')
 
-    def handle_input(self, event):
-        if event.type == KEYDOWN:
-            if event.key == K_UP:
-                self.vel += 2.0
-
-            if event.key == K_DOWN:
-                self.vel -= 2.0
-
-            if event.key == K_RIGHT:
-                self.torque -= 2.0
-
-            if event.key == K_LEFT:
-                self.torque += 2.0
-
-            if event.key == K_SPACE:
-                self.fire()
+#    def handle_input(self, event):
+#        if event.type == KEYDOWN:
+#            if event.key == K_UP:
+#                self.vel += 2.0
+#
+#            if event.key == K_DOWN:
+#                self.vel -= 2.0
+#
+#            if event.key == K_RIGHT:
+#                self.torque -= 2.0
+#
+#            if event.key == K_LEFT:
+#                self.torque += 2.0
+#
+            #if event.key == K_SPACE:
+                #self.fire()
                 #gameengine.jukebox.play_sound('rocket')
-
-        elif event.type == KEYUP:
-            if event.key == K_UP:
-                self.vel -= 2.0
-
-            if event.key == K_DOWN:
-                self.vel += 2.0
-
-            if event.key == K_RIGHT:
-                self.torque += 2.0
-
-            if event.key == K_LEFT:
-                self.torque -= 2.0
+#
+#        elif event.type == KEYUP:
+#            if event.key == K_UP:
+#                self.vel -= 2.0
+#
+#            if event.key == K_DOWN:
+#                self.vel += 2.0
+#
+#            if event.key == K_RIGHT:
+#                self.torque += 2.0
+#
+#            if event.key == K_LEFT:
+#                self.torque -= 2.0
 
     def update(self):
 #        while self.collision_list:

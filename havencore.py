@@ -32,13 +32,17 @@ def setup_logging(debug):
     else:
         output = logging.INFO
 
-    logging.basicConfig(filename='log.log', filemode='w', level=output)
+    logging.basicConfig(filename='havencore.log', filemode='w', level=output)
     console = logging.StreamHandler()
+    formatter = logging.Formatter('%(levelname)s:%(name)s: %(message)s')
+    console.setFormatter(formatter)
     console.setLevel(output)
     logging.getLogger().addHandler(console)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Start the game')
+    parser = argparse.ArgumentParser(
+            description='Haven Core, the most awesomest game ever to be '
+                        'written by humans!')
 
     mode = parser.add_mutually_exclusive_group()
     output = parser.add_mutually_exclusive_group()
