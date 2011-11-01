@@ -5,6 +5,7 @@ from math import floor, radians, sin, cos
 import pygame
 from pygame.locals import *
 from gameengine import gameengine
+import sqlite3
 
 __author__    = "Gustav Fahlén, Max Sidenstjärna, Christofer Odén"
 __credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
@@ -76,61 +77,84 @@ class Vehicle(Entity):
 
     """Generic class for all types of vehicles in the game"""
 
-    maxvel = 10.0
+    def __init__(self, player, (x, y), rot, modules):
 
-    def __init__(self, player, (x, y), rot):
         Entity.__init__(self, player, (x, y), 40)
         self.rot = rot
-
+        self.maxvel = 0
         self.torque = 0
         self.vel = 0
+        
+        #some standard values
+        self.speed = 5
         self.strafe = 0
 
         self.health = 100
-
+       
+        self.active_modules = []
+        #change standard values according to what modules vehicle is built of. 
+        self.set_modules(modules)
         self.children = []
+        print "This vehicle has " + str(self.health) + "HP and "+str(self.speed) + "in speed"
+
+    def set_modules(self, modules):
+        conn = sqlite3.connect('server/havencore.db')
+        c = conn.cursor()
+        c.execute('select * from modules')
+        for module in c:
+            if module[0] in modules:
+                if module[0] not in self.active_modules:
+                    self.active_modules.append(module[0]) #Append the module
+                
+                if module[1] == 'speed': #this module changes speed
+                    self.speed += module[2]
+                elif module[1] == 'armor':
+                    self.health += module[2]
+                
+
+
 
     def handle_input(self, event):
         if event.type == KEYDOWN:
             if event.key == K_w:
-                self.vel += self.maxvel
+                self.vel += self.speed
 
             if event.key == K_s:
-                self.vel -= self.maxvel
+                self.vel -= self.speed
 
             if event.key == K_d:
-                self.strafe -= self.maxvel
+                self.strafe -= self.speed
 
             if event.key == K_a:
-                self.strafe += self.maxvel
+                self.strafe += self.speed
 
             if event.key == K_LEFT:
-                self.torque += self.maxvel / 2.0
+                self.torque += self.speed / 2.0
 
             if event.key == K_RIGHT:
-                self.torque -= self.maxvel / 2.0
+                self.torque -= self.speed / 2.0
 
             if event.key == K_SPACE:
                 self.fire()
 
         elif event.type == KEYUP:
             if event.key == K_w:
-                self.vel -= self.maxvel
+                self.vel -= self.speed
 
             if event.key == K_s:
-                self.vel += self.maxvel
+                self.vel += self.speed
 
             if event.key == K_d:
-                self.strafe += self.maxvel
+                self.strafe += self.speed
 
             if event.key == K_a:
-                self.strafe -= self.maxvel
+                self.strafe -= self.speed
 
             if event.key == K_LEFT:
-                self.torque -= self.maxvel / 2.0
+                self.torque -= self.speed / 2.0
 
             if event.key == K_RIGHT:
-                self.torque += self.maxvel / 2.0
+                self.torque += self.speed / 2.0
 
     def update(self):
         Entity.update(self)

@@ -90,7 +90,8 @@ class Server:
             self.clients[username] = client
 
             # For now, create a vehicle:
-            gameengine.add_entity(Vehicle(username, (400, 300), 120))
+            gameengine.add_entity(Vehicle(username, (400, 300),
+            120,('bigmotor','smallmotor')))
 
             return True
 
