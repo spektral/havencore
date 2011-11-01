@@ -143,7 +143,8 @@ class Server:
             self.clients[username] = client_socket
 
             # For now, create a vehicle:
-            gameengine.add_entity(Vehicle(username, (400, 300), 120))
+            gameengine.add_entity(Vehicle(username, (400, 300),
+            120,('armor','smallmotor')))
 
             return True
 
