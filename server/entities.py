@@ -60,7 +60,8 @@ class Entity(object):
             pass
 
         return state
-
+    def get_colliders(self):
+        return self.collision_list
     def check_collisions(self, entities):
         for entity in entities:
             if entity is not self and entity.is_collidable:
