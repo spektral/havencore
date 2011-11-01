@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from math import floor, radians, sin, cos
+import logging
+
 import pygame
 from pygame.locals import *
+
 from gameengine import gameengine
 import sqlite3
 
@@ -41,28 +44,23 @@ class Entity(object):
 
         # Get the state of the object
         state = { 'type': 'entity',
-                 'name': self.__class__.__name__,
-                 'dict': dict(self.__dict__) }
+                  'name': self.__class__.__name__,
+                  'dict': dict(self.__dict__) }
 
         # Weed out unnecessary fields
-        try:
-            del state['dict']['children']
-        except KeyError:
-            pass
+        blacklist = ['children', 'parent', 'collision_list', 'logger']
 
-        try:
-            del state['dict']['parent']
-        except KeyError:
-            pass
-
-        try:
-            del state['dict']['collision_list']
-        except KeyError:
-            pass
+        for item in blacklist:
+            try:
+                del state['dict'][item]
+            except KeyError:
+                pass
 
         return state
+
     def get_colliders(self):
         return self.collision_list
+
     def check_collisions(self, entities):
         for entity in entities:
             if entity is not self and entity.is_collidable:
@@ -78,16 +76,17 @@ class Vehicle(Entity):
     """Generic class for all types of vehicles in the game"""
 
     def __init__(self, player, (x, y), rot, modules):
+        self.logger = logging.getLogger('server.entities.Vehicle')
 
         Entity.__init__(self, player, (x, y), 40)
         self.rot = rot
         self.maxvel = 0
         self.torque = 0
         self.vel = 0
+        self.strafe_vel = 0
         
         #some standard values
         self.speed = 5
-        self.strafe = 0
 
         self.health = 100
        
@@ -95,7 +94,8 @@ class Vehicle(Entity):
         #change standard values according to what modules vehicle is built of. 
         self.set_modules(modules)
         self.children = []
-        print "This vehicle has " + str(self.health) + "HP and "+str(self.speed) + "in speed"
+        self.logger.debug("HP: %s  Speed: %s" %
+                          (self.health, self.speed))
 
     def set_modules(self, modules):
         conn = sqlite3.connect('server/havencore.db')
@@ -110,9 +110,6 @@ class Vehicle(Entity):
                     self.speed += module[2]
                 elif module[1] == 'armor':
                     self.health += module[2]
-                
-
-
 
     def handle_input(self, event):
         if event.type == KEYDOWN:
@@ -123,10 +120,10 @@ class Vehicle(Entity):
                 self.vel -= self.speed
 
             if event.key == K_d:
-                self.strafe -= self.speed
+                self.strafe_vel -= self.speed
 
             if event.key == K_a:
-                self.strafe += self.speed
+                self.strafe_vel += self.speed
 
             if event.key == K_LEFT:
                 self.torque += self.speed / 2.0
@@ -145,10 +142,10 @@ class Vehicle(Entity):
                 self.vel += self.speed
 
             if event.key == K_d:
-                self.strafe += self.speed
+                self.strafe_vel += self.speed
 
             if event.key == K_a:
-                self.strafe -= self.speed
+                self.strafe_vel -= self.speed
 
             if event.key == K_LEFT:
                 self.torque -= self.speed / 2.0
@@ -179,8 +176,8 @@ class Vehicle(Entity):
 
         self.x += (self.vel * sin(radians(self.rot)))
         self.y += (self.vel * cos(radians(self.rot)))
-        self.x += (self.strafe * sin(radians(self.rot + 90.0)))
-        self.y += (self.strafe * cos(radians(self.rot + 90.0)))
+        self.x += (self.strafe_vel * sin(radians(self.rot + 90.0)))
+        self.y += (self.strafe_vel * cos(radians(self.rot + 90.0)))
 
     def fire(self):
         missile = Missile(self.player, (self.x, self.y), 12, self.rot,
