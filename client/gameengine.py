@@ -48,8 +48,8 @@ class Connection:
         self.username = username
 
         self.addr = addr
-        self.socket = socket(AF_INET, SOCK_STREAM)
-        self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        #self.socket = socket(AF_INET, SOCK_STREAM)
+        #self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 
     def connect(self):
 
@@ -58,7 +58,8 @@ class Connection:
         self.logger.info("Connecting to %s:%s." % self.addr)
 
         try:
-            self.socket.connect(self.addr, 5)
+            self.socket = create_connection(self.addr, 5)
+            self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         except IOError as e:
             self.logger.critical("Connection failed: %s" % e)
             sys.exit(1)
