@@ -4,15 +4,15 @@
 import sys
 import logging
 
-import json
-import zlib
-
 import select
 from socket import *
+import errno
 
 import pygame
 from pygame.event import Event
 from pygame.locals import *
+
+from common import net
 
 __author__    = "Christofer Odén"
 __credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
@@ -25,9 +25,6 @@ class Server:
     Handles transmission and receiving data, and keeps track of clients.
 
     """
-
-    BUFSIZE = 65536
-    use_compression = True
 
     def __init__(self, port):
 
@@ -56,108 +53,57 @@ class Server:
         self.logger.info("Starting to listen on %s" % self.port)
         self.server_socket.listen(5)
 
-    def send(self, socket, data):
-
-        """Pack and transmit data to a remote host"""
-
-        try:
-            data = json.dumps(data, separators=(',',':'))
-        except:
-            self.logger.error("Data could not be JSON coded")
-            self.logger.debug("Data causing error:\n%s" % data)
-            return
-
-        if self.use_compression:
-            try:
-                data = zlib.compress(data)
-            except:
-                self.logger.error("Data could not be zlib compressed")
-                self.logger.debug("Data causing error:\n%s" % data)
-                return
-
-        bytes_sent = socket.send(data)
-        if not bytes_sent == len(data):
-            self.logger.error("Could not send all data")
-
-    def receive(self, socket):
-
-        """Receive and unpack data from a remote host"""
-
-        try:
-            data = socket.recv(self.BUFSIZE)
-        except IOError as e:
-            # There might be an IOError which should not lead to disconnect.
-            #if not e.errno == xxx:
-            self.disconnect_client(socket, e)
-            return (None, None)
-
-        if not data:
-            self.disconnect_client(socket, "Remote host disconnected")
-            return (None, None)
-
-        if self.use_compression == True:
-            try:
-                data = zlib.decompress(data)
-            except:
-                self.logger.error("Data could not be zlib decompressed")
-                self.logger.debug("Data causing error:\n%s" % data)
-                return (None, None)
-
-        try:
-            data = json.loads(data)
-        except:
-            self.logger.error("Data could not be JSON decoded")
-            self.logger.debug("Data causing error:\n%s" % data)
-            return (None, None)
-
-        if not 'username' in data or not 'message' in data:
-            self.logger.error("Data missing username or message")
-            self.logger.debug("Data causing error:\n%s" % data)
-            return (None, None)
-
-        else:
-            return (data['username'], data['message'])
-
     def on_connect(self):
 
         """Handle client(s) awaiting connection."""
 
-        client_socket, address = self.server_socket.accept()
+        client, address = self.server_socket.accept()
 
-        username, message = self.receive(client_socket)
+        try:
+            username, messages = net.receive(client)
+        except IOError as e:
+            if e.errno == errno.ECONNRESET:
+                self.disconnect_client(client, "Connection lost")
+            else:
+                self.logger.error(e.strerror)
+            return
 
         if username in self.clients.keys():
             # The username is already taken, refuse connection
-            self.send(client_socket, { 'accepted': False,
-                                       'reason': 'Username unavailable' })
             self.logger.info("Refused connection from %s:%d, "
                     "username '%s' unavailable" %
-                    (address[0], address[1], username))
+                    (address, username))
+
+            net.send(client, { 'accepted': False,
+                               'reason': 'Username unavailable' })
+
+            self.disconnect_client(client, "Username unavailable")
+
             return False
 
         else:
             # The username is free, accept the client
             self.logger.info("Connection from %s:%d, username '%s' accepted" %
                     (address[0], address[1], username))
-            self.send(client_socket, { 'accepted': True })
-            self.clients[username] = client_socket
+
+            net.send(client, { 'accepted': True })
+            self.clients[username] = client
 
             # For now, create a vehicle:
             gameengine.add_entity(Vehicle(username, (400, 300),
-            120,('armor','smallmotor')))
+            120,('bigmotor','smallmotor')))
 
             return True
 
     def disconnect_client(self, socket, reason):
-        s = None
-        for username, s in self.clients.iteritems():
-            if s == socket: break
+        for username, client in self.clients.iteritems():
+            if client == socket: break
 
-        if not s:
+        if not client:
             self.logger.debug("Could not delete and disconnect client socket")
             return
 
-        s.close()
+        client.close()
         del self.clients[username]
         self.logger.info("Disconnecting user '%s': %s" % (username, reason))
 
@@ -166,16 +112,30 @@ class Server:
         """Parse all events from a single client, return a dict with
         username: events"""
 
-        username, events = self.receive(socket)
-        if None in (username, events):
-            return (None, None)
+        try:
+            username, messages = net.receive(socket)
+            if username == None:
+                return
+        except IOError as e:
+            if e.errno == errno.ECONNRESET:
+                self.disconnect_client(socket, "Connection lost")
+            else:
+                self.logger.error(e.strerror)
+            return None, None
+
+        events = []
+        for message in filter(lambda m:m['label'] == 'events', messages):
+            events += message['events']
+
+        #self.logger.debug("Events: %s" % events)
 
         event_list = []
-
         for event in events:
+            #self.logger.debug("Event: %s" % event)
             if 'type' not in event:
                 self.logger.error("Malformed event")
                 self.logger.debug("Event causing error:\n%s" % event)
+                raise Exception("Malformed event")
                 return username, None
 
             elif event['type'] in (KEYDOWN, KEYUP):
@@ -207,11 +167,11 @@ class Server:
 
             else:
                 # There are new messages from connected clients
-                username, event_list = self.get_client_events(socket)
-                if None in (username, event_list):
+                username, events = self.get_client_events(socket)
+                if not events:
                     continue
 
-                event_dict[username] = event_list
+                event_dict[username] = events
 
         return event_dict
 
@@ -223,7 +183,7 @@ class Server:
         # Select only wriatable sockets.  Timeout = 0, instant
         readable, writable, in_error = select.select([], send_list, [], 0)
         for socket in writable:
-            self.send(socket, data)
+            net.send(socket, data)
 
 
 class GameEngine(object):

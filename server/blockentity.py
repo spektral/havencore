@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pygame 
 from defines import *
-from entity import Entity
+from entities import Entity
 
 """
 Generic class for all projectiles in the game.
@@ -10,7 +10,7 @@ Generic class for all projectiles in the game.
 class BlockEntity(Entity):
     #def __init__(self, (x,y), vel, rot, filename, size, parent):
     def __init__(self, (x,y), vel, rot, (r,g,b), size, parent):
-        Entity.__init__(self, (x, y), size / 2)
+        Entity.__init__(self, (x, y), size*2)
         self.color = (r,g,b)
         self.x = x
         self.y = y
@@ -28,13 +28,13 @@ class BlockEntity(Entity):
 
     def getRect(self):
         return (x, y, BLOCKSIZE, BLOCKSIZE)
-    def isWalkable(self):
+    def is_walkable(self):
         if self.color == black:
             return 0
         return 1
     def toString(self):
         return str(self.x) + " " + str(self.y)+ " " + str(self.color) + " " + str(self.size) + "\n"
-    def setColor(self,color):
+    def set_color(self,color):
         self.color = color
         
 
@@ -80,11 +80,11 @@ class BlockEntity(Entity):
     def getParent(self):
         return self.parent
     
-    def getAdjacentList(self):
+    def get_adjacent_list(self):
         return self.adjacentList
     
-    def setAdjacentList(self, adjacentList):
-        self.adjacentList = adjacentList
+    def set_adjacent_list(self, adjacent_list):
+        self.adjacentList = adjacent_list
     def addAdjacent(self, adjacent):
         self.adjacentList.append(adjacent)
         
@@ -92,7 +92,7 @@ class BlockEntity(Entity):
         self.x = x
     def setY(self,y):
         self.y = y
-    def setH(self,h):
+    def set_h(self,h):
         self.h = h
     def setF(self,f):
         self.f = f

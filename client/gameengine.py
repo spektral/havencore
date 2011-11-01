@@ -10,19 +10,18 @@ game loop.
 import sys
 import logging
 
-import json
-import zlib
-
 import select
 from socket import *
 
 import pygame
 from pygame.locals import *
 
+from common import net
+
 from entities import *
 
 from defines import *
-from jukebox import JukeBox
+from jukebox import jukebox
 from mapHandler import MapHandler
 
 __author__    = "Gustav Fahlén, Christofer Odén, Max Sidenstjärna"
@@ -34,12 +33,11 @@ __license__   = "GPL"
 class Connection:
 
     """
-    Handles transmission and receiving data to the server.
+    Handle communication between server and client.
+
+    Perform connect, send events, and receive state.
 
     """
-
-    BUFSIZE = 65536
-    use_compression = True
 
     def __init__(self, username, addr):
 
@@ -55,7 +53,7 @@ class Connection:
 
     def connect(self):
 
-        """Connect to the remote host"""
+        """Negotiate for connection to remote host."""
 
         self.logger.info("Connecting to %s:%s." % self.addr)
 
@@ -65,75 +63,22 @@ class Connection:
             self.logger.critical("Connection failed: %s" % e)
             sys.exit(1)
 
-        self.send({'username': self.username, 'message': 'ICANHAZCONNECT?'})
+        net.send(self.socket, 'icanhazconnectplz?', self.username)
 
-        response = self.receive()
-        if 'accepted' not in response:
+        servername, response = net.receive(self.socket)
+        if servername == None:
+            self.logger.critical("Connection failed: Unknown reason")
+
+        if 'accepted' not in response[0]:
             self.logger.critical("Bad server response")
             self.logger.debug("Data causing error:\n%s" % response)
             sys.exit(1)
 
-        if response['accepted'] == False:
-            self.logger.critical("Connection failed: %s" % response['reason'])
+        if response[0]['accepted'] == False:
+            self.logger.critical("Connection failed: %s" %
+                                 response[0]['reason'])
         else:
             self.logger.info("Connected")
-
-    def send(self, data):
-
-        """Pack and transmit data to a remote host"""
-
-        try:
-            data = json.dumps(data, separators=(',',':'))
-        except:
-            self.logger.error("Data could not be JSON coded")
-            self.logger.debug("Data causing error:\n%s" % data)
-            return
-
-        if self.use_compression:
-            try:
-                data = zlib.compress(data)
-            except:
-                self.logger.error("Data could not be zlib compressed")
-                self.logger.debug("Data causing error:\n%s" % data)
-                return
-
-        bytes_sent = self.socket.send(data)
-        if not bytes_sent == len(data):
-            self.logger.error("Could not send all data")
-
-    def receive(self):
-
-        """Receive and unpack data from a remote host"""
-
-        try:
-            data = self.socket.recv(self.BUFSIZE)
-        except IOError as e:
-            # There might be an IOError which should not lead to disconnect.
-            #if not e.errno == xxx:
-            self.logger.critical("Error receiving data: %s" % e)
-            sys.exit(1)
-
-        if not data:
-            self.logger.critical("Remote host disconnected")
-            sys.exit(1)
-
-        if self.use_compression == True:
-            try:
-                data = zlib.decompress(data)
-            except:
-                self.logger.error("Data could not be zlib decompressed")
-                self.logger.debug("Data causing error:\n%s" % data)
-                return None
-
-        try:
-            data = json.loads(data)
-        except:
-            self.logger.error("Data could not be JSON decoded")
-            self.logger.debug("Data causing error:\n%s" % data)
-            return None
-
-        else:
-            return data
 
     def get_state(self):
 
@@ -144,21 +89,21 @@ class Connection:
         read_list = [self.socket]
         readable, writable, in_error = select.select(read_list, [], [], 0)
         for socket in readable:
-            state = self.receive()
+            servername, state = net.receive(self.socket)
 
         if state == None:
             return []
         else:
             return state
 
-    def transmit(self, data):
+    def transmit(self, message):
 
         """Send the game state to all clients."""
 
         send_list = [self.socket]
         readable, writable, in_error = select.select([], send_list, [], 0)
         for socket in writable:
-            self.send(data)
+            net.send(socket, message, self.username)
 
 
 class GameEngine(object):
@@ -174,17 +119,19 @@ class GameEngine(object):
 
     def initialize(self, username, addr):
         """Initialize the game engine with screen resolution."""
-        logging.info("Initializing client engine...")
+        self.logger = logging.getLogger('client.gameengine.GameEngine')
+        self.logger.info("Initializing client engine...")
 
-        logging.info("Initializing pygame...")
+        self.logger.info("Initializing pygame...")
         pygame.init()
-        self.screen = pygame.display.set_mode((800, 600))
+        self.screen = pygame.display.set_mode((1024, 768))
         pygame.display.set_caption("Haven Core")
+
+        jukebox.initialize()
 
         self.username = username
         self.connection = Connection(username, addr)
-        self.mapHandler = MapHandler(WIDTH, HEIGHT, 40)
-        self.jukebox = JukeBox()
+        self.mapHandler = MapHandler(1024, 768, 40)
         self.entities = []
 
     def add_entity(self, entity):
@@ -193,7 +140,7 @@ class GameEngine(object):
 
     def start(self):
         """Start the game engine."""
-        logging.info("Starting client engine...")
+        self.logger.info("Starting client engine...")
         self.connection.connect()
         self.fps_clock = pygame.time.Clock()
 
@@ -205,7 +152,7 @@ class GameEngine(object):
             self.fps_clock.tick(50)
 
     def quit(self):
-        logging.info("Stopping client engine...")
+        self.logger.info("Stopping client engine...")
         self.is_running = False
     
     def handle_input(self):
@@ -213,7 +160,7 @@ class GameEngine(object):
         """Take input from the user and check for other events like
         collisions."""
 
-        event_pack = { 'username': self.username, 'message': [] }
+        events = []
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -225,14 +172,12 @@ class GameEngine(object):
                     self.quit()
                     break
 
-            net_event = { 'type': event.type }
-
             if event.type in (KEYDOWN, KEYUP):
-                net_event['key'] = event.key
-                event_pack['message'].append(net_event)
+                events.append({ 'type': event.type, 'key': event.key })
 
-        if event_pack['message']:
-            self.connection.transmit(event_pack)
+        # Only bother to transmit events that matter
+        if events:
+            self.connection.transmit({ 'label': 'events', 'events': events })
             
             #for entity in self.entities:
             #    entity.handle_input(event)
@@ -245,13 +190,16 @@ class GameEngine(object):
 
         """Get state from server and update the known entities."""
 
-        state = self.connection.get_state()
-        if state:
-            self.entities = []
+        state_list = self.connection.get_state()
+        #self.logger.debug("State List: %s" % state_list)
+        #if state_list:
+            #self.entities = []
 
-            for input in state:
-                name = input['name']
-                dict = input['dict']
+        for state in state_list:
+            for entity in state:
+                #self.logger.debug("State: %s" % state)
+                name = entity['name']
+                dict = entity['dict']
                 serial = dict['serial']
 
                 # Create objects that doesn't exist yet
@@ -266,8 +214,9 @@ class GameEngine(object):
                         self.entities.append(
                                 Missile(dict, "client/img/missile2.png",
                                         (32, 32)))
+                        jukebox.play_sound('rocket')
 
-                # If the object doesn't exist, update it with the new data
+                # If the object exists, update it with the new data
                 else:
                     entity = filter(lambda x:x.serial == serial,
                                     self.entities)[0]
@@ -276,7 +225,7 @@ class GameEngine(object):
         for entity in self.entities:
             entity.update()
 
-        self.jukebox.update()
+        jukebox.update()
 
         self.entities = filter(lambda x:x.alive, self.entities)
 
