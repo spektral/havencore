@@ -58,7 +58,7 @@ class Connection:
         self.logger.info("Connecting to %s:%s." % self.addr)
 
         try:
-            self.socket.connect(self.addr)
+            self.socket.connect(self.addr, 5)
         except IOError as e:
             self.logger.critical("Connection failed: %s" % e)
             sys.exit(1)
