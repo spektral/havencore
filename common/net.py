@@ -61,10 +61,8 @@ def receive(socket):
     if not net_data:
         raise IOError(errno.ECONNRESET, "Connection lost")
 
-    data = split_zlib(net_data)
-
     try:
-        data = map(zlib.decompress, data)
+        data = map(zlib.decompress, split_zlib(net_data))
     except Exception as e:
         logger.error("%s: %s\nData: %s" %
                      (e.__class__.__name__, e, data.__repr__()))
@@ -90,21 +88,23 @@ def receive(socket):
 
 def split_zlib(string):
 
-    """Splits a string containing multiple zlib compressed substrings"""
+    """Split a string containing multiple zlib compressed substrings,
+    return the list of decompressed strings"""
     
     header = 'x\x9c'
 
     strings = []
     index = string.find(header)
     while index >= 0:
-        # Find the position of the next header
+        # Find the position of the next string
         next_index = string.find(header, index + 1)
 
         if next_index >= 0:
-            # Take all the chars up to the next header
+            # Store all the bytes up to the next header
             strings.append(string[index : next_index])
         else:
-            # No more headers in the string, take all chars that's left
+            # There are no more substrings in the string, store the
+            # rest of it
             strings.append(string[index:])
 
         # Continue at the next header's position

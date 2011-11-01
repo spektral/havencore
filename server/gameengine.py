@@ -70,7 +70,7 @@ class Server:
 
         if username in self.clients.keys():
             # The username is already taken, refuse connection
-            self.logger.info("Refused connection from %s:%d, "
+            self.logger.info("Refused connection from %s:%s, "
                     "username '%s' unavailable" %
                     (address, username))
 

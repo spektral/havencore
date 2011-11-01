@@ -70,7 +70,7 @@ class JukeBox:
             self.play_song(self.track)
     
     def play_sound(self, name):
-        self.logger.info("Play sound: %s" % name)
+        self.logger.debug("Playing sound: %s" % name)
         self.sounds[name].play()
 
 jukebox = JukeBox()
