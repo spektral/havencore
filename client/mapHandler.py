@@ -9,7 +9,18 @@ from blockentity import BlockEntity
 #from filehandler import *
 
 
-
+class MapCamera:
+    def __init__(self, width, height, map_handler):
+        self.width = width
+        self.height = height
+        self.map_handler = map_handler
+    def draw(self):
+        pass
+    def update(self):
+        pass
+    def handle_input(self, event):
+        pass
+    
 class MapHandler:
     def __init__(self,width, height, blockSize):
         self.screen = 0
@@ -19,7 +30,9 @@ class MapHandler:
         self.blockList = []
         self.init_blockList()
         self.init_adjacent()
-        
+        self.speed = (0,0)
+        self.first = 1 
+        self.offset = (0,0)
         # for painting and illustrating of algorithms:
         self.illustrate = True
         self.delay = DELAY
@@ -33,11 +46,20 @@ class MapHandler:
                 self.blockList.append(BlockEntity((i*self.blockSize, j*self.blockSize), 0, 0, white, self.blockSize, None))
            # to be used.
            #    self.blockList.append(BlockEntity((i*self.blockSize, j*self.blockSize), 0, 0, "", self.blockSize, None):
-    def handle_input(self,event):
+    def update(self):
+        self.offset = (self.speed[0] + self.offset[0], self.speed[1] + self.offset[1])
+    def handle_input(self,event = 0):
+        print pygame.mouse.get_pos()[0]
+        if pygame.mouse.get_pos()[0] < 50:
+            self.speed = (10, 0)
+        if pygame.mouse.get_pos()[0] > 400:
+            self.speed = (- 10, 0)
+        if self.speed[0] != 0 and pygame.mouse.get_pos()[0] > 50 and pygame.mouse.get_pos()[0] < 400:
+            self.speed = (0,0)
         if event.type == pygame.MOUSEBUTTONDOWN:
+            pass
             #self.start = self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
             
-            self.get_block_at(pygame.mouse.get_pos()).set_color(black)
             #paint all colliding.
             #collider =self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
             #collider.check_collisions(self.blockList)
@@ -45,9 +67,9 @@ class MapHandler:
             #    colliding.set_color(red)
 
        
-        #if event.type == pygame.MOUSEBUTTONUP:
-            #self.end = self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
-            #self.calc_path(self.start, self.end)
+       # if event.type == pygame.MOUSEBUTTONUP:
+        #    self.end = self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
+            #elf.calc_path(self.start, self.end)
 
     def clear(self):
         self.blockList = []
@@ -76,29 +98,36 @@ class MapHandler:
     def random_fill(self):
         #self.blockList[0].setColor(red)
         self.changed.append(random.choice(self.blockList))
-        self.changed[len(self.changed)-1].setColor(random.choice(colorList))
+        self.changed[len(self.changed)-1].set_color(random.choice(colorList))
         #random.choice(self.blockList).setColor(random.choice(colorList))
         
     def draw(self, screen):
         # HACK
         self.screen = screen
-        #self.random_fill()
+        self.random_fill()
      
         self.draw_board(screen)
         # this will n
-        for c in self.blockList: 
-            c.draw(screen)
-        self.changed = []
+        for c in self.changed: 
+            c.draw(screen, self.offset[0], self.offset[1])
+        #HACK
+        if self.first == 1:
+            self.changed = []
+            self.first = 0
+    
     def update_all(self):
         self.changed = self.blockList
+    
     def draw_board(self,screen):    
         p = 0
         for i in range(0, self.width/self.blockSize):
-            pygame.draw.line(screen, red, (p, 0), (p,self.height), 1)
+            pygame.draw.line(screen, red, (p+self.offset[0], 0+self.offset[1]),
+                    (p+self.offset[0],self.height), 1)
             p = p+self.blockSize
         p = 0
         for i in range(0,self.height/self.blockSize):
-            pygame.draw.line(screen, red, (0,p), (self.width,p), 1)
+            pygame.draw.line(screen, red, (0+self.offset[0],p+self.offset[1]),
+                    (self.width,p), 1)
             p = p+self.blockSize
                
     def remove_colliding(self, block):
@@ -106,9 +135,9 @@ class MapHandler:
                 if block.x == t.x and block.y == t.y:
                     self.blockList.remove(t)
                     
-    def change_color_at(self, i, color):
-        self.changed.append(self.blockList[i])
-        self.blockList[i].setColor(color)
+    def change_color_at(self, (x,y), color):
+        self.changed.append(self.blockList[self.get_block_index((x,y))])
+        self.get_block_index((x,y)).change_color(color)
     
     def get_width(self):
         return self.width

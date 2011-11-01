@@ -37,29 +37,11 @@ class BlockEntity(Entity):
     def set_color(self,color):
         self.color = color
         
-
-    def drawFGH(self,screen):
-        self.font = pygame.font.Font(None,12)
-        self.fpsString = "F: " + str(self.g) + "\nG:" + str(self.g) + "\nH:" + str(self.h)
-        text = self.font.render(self.fpsString,True, black, (159,182,205))
-        self.fpsRect = text.get_rect()
-        self.fpsRect.centerx = self.x#self.screen.get_rect().centerx
-        self.fpsRect.centery = self.y#self.screen.get_rect().centery
-        screen.blit(text,self.fpsRect)
-        pygame.display.update()
-   
            
                
-    def draw(self,screen):
-        #change color if we got a val
-        #if self.f != 0 and self.color != pink:
-         #   self.setColor(blue)
-        pygame.draw.rect(screen,self.color,(( self.x, self.y), (self.size-2,self.size-2)))
+    def draw(self,screen, x_offset = 0, y_offset = 0):
+        pygame.draw.rect(screen,self.color,(( self.x+x_offset, self.y+y_offset), (self.size-2,self.size-2)))
         
-       # if self.color == pink and self.parent != 0:
-       #     self.drawParentLine(screen)
-        #if self.color == black:
-        #    self.drawAdjacentLines(screen)
     def drawParentLine(self,screen):
         pygame.draw.line(screen, green, (self.x(self.size/2), self.y+(self.size/2)), (self.parent.getX()+(self.size/2), self.parent.getY()+(self.size/2)),1) 
     def drawAdjacentLines(self,screen):
