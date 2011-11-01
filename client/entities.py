@@ -59,6 +59,8 @@ class Vehicle:
 
     def draw(self, screen):
         self.sprite.draw(screen, self.x, self.y)
+    def get_health(self):
+        return self.health
 
     def fire(self):
         pass
