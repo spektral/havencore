@@ -23,7 +23,7 @@ from entities import *
 from defines import *
 from jukebox import jukebox
 from mapHandler import MapHandler
-
+from HUD import HUD
 __author__    = "Gustav Fahlén, Christofer Odén, Max Sidenstjärna"
 __credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
 __copyright__ = "Copyright 2011 Daladevelop"
@@ -125,15 +125,16 @@ class GameEngine(object):
 
         self.logger.info("Initializing pygame...")
         pygame.init()
-        self.screen = pygame.display.set_mode((1024, 768))
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Haven Core")
 
         jukebox.initialize()
 
         self.username = username
         self.connection = Connection(username, addr)
-        self.mapHandler = MapHandler(1024, 768, 40)
+        self.map_handler = MapHandler(10000, 10000, 40)
         self.entities = []
+        self.HUD = HUD((250,650))
 
     def add_entity(self, entity):
         """Append a game object to the object list."""
@@ -148,6 +149,7 @@ class GameEngine(object):
         self.is_running = True
         while(self.is_running):
             self.handle_input()
+            self.map_handler.update()
             self.get_server_state()
             self.draw()
             self.fps_clock.tick(50)
@@ -160,10 +162,10 @@ class GameEngine(object):
 
         """Take input from the user and check for other events like
         collisions."""
-
         events = []
 
         for event in pygame.event.get():
+            self.map_handler.handle_input(event)
             if event.type == QUIT:
                 self.quit()
                 break
@@ -182,7 +184,6 @@ class GameEngine(object):
             
             #for entity in self.entities:
             #    entity.handle_input(event)
-            #    self.mapHandler.handle_input(event)
 
         #for entity in self.entities:
         #    entity.check_collisions(self.entities)
@@ -216,6 +217,9 @@ class GameEngine(object):
                                 Missile(dict, "client/img/missile2.png",
                                         (32, 32)))
                         jukebox.play_sound('rocket')
+                    if name == 'Block':
+                        print "Block"
+                   #     self.mapHandler.change_color_at(
 
                 # If the object exists, update it with the new data
                 else:
@@ -233,8 +237,8 @@ class GameEngine(object):
     def draw(self):
         """Draw stuff to the screen."""
         self.screen.fill((66, 66, 111))
-        self.mapHandler.draw(self.screen)
-
+        self.map_handler.draw(self.screen)
+        self.HUD.draw(self.screen)
         for entity in self.entities:
             entity.draw(self.screen)
 
