@@ -34,7 +34,8 @@ def setup_logging(debug):
 
     logging.basicConfig(filename='havencore.log', filemode='w', level=output)
     console = logging.StreamHandler()
-    formatter = logging.Formatter('%(levelname)s:%(name)s: %(message)s')
+    formatter = logging.Formatter(
+            '%(levelname)s:%(name)s:%(lineno)s: %(message)s')
     console.setFormatter(formatter)
     console.setLevel(output)
     logging.getLogger().addHandler(console)
