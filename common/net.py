@@ -8,6 +8,7 @@ __credits__   = ["Christofer Odén"]
 __copyright__ = "Copyright 2011 Daladevelop"
 __license__   = "GPL"
 
+import select
 import logging
 import json
 import zlib
@@ -15,6 +16,22 @@ import errno
 
 BUFSIZE = 65536
 logger = logging.getLogger('common.net')
+
+def readable(socket):
+
+    """Test if the socket is readable."""
+
+    readable, writable, in_error = select.select([socket], [], [], 0)
+    return (readable != [])
+
+
+def writable(socket):
+
+    """Test if the socket is writeable."""
+
+    readable, writable, in_error = select.select([], [socket], [], 0)
+    return (writable != [])
+
 
 def send(socket, message, username='server'):
 
@@ -41,9 +58,15 @@ def send(socket, message, username='server'):
         raise
         #raise IOError(0, "zlib.compress failed")
 
+    # Put a header indicating how long the message is
+    assert(len(message) < 10 ** 5)
+    message = "%05d%s" % (len(message), message)
+
     bytes_sent = socket.send(message)
     if bytes_sent != len(message):
         raise IOError(0, "Could not send all data")
+
+    #logger.debug("Sent message:\n%s" % repr(message))
 
 
 def receive(socket):
@@ -56,18 +79,32 @@ def receive(socket):
     
     Return username, message(s)"""
 
-    net_data = socket.recv(BUFSIZE)
+    net_data = []
 
-    if not net_data:
-        raise IOError(errno.ECONNRESET, "Connection lost")
+    while True:
+        msglen = socket.recv(5)
+        if not msglen:
+            raise IOError(errno.ECONNRESET, "Connection lost")
+
+        #logger.debug("Got msglen:\n%s" % repr(msglen))
+
+        msglen = int(msglen)
+
+        net_data.append(socket.recv(msglen))
+        if not net_data[-1]:
+            raise IOError(errno.ECONNRESET, "Connection lost")
+
+        if not readable(socket):
+            break
+
+    #logger.debug("net_data:\n%s" % repr(net_data[-1]))
 
     try:
-        data = map(zlib.decompress, split_zlib(net_data))
+        data = map(zlib.decompress, net_data)
     except Exception as e:
         logger.error("%s: %s\nData: %s" %
-                     (e.__class__.__name__, e, data.__repr__()))
+                     (e.__class__.__name__, e, repr(net_data)))
         return None, None
-        #raise IOError(0, "zlib.decompress failed")
 
     try:
         messages = map(json.loads, data)
@@ -75,7 +112,7 @@ def receive(socket):
         logger.error("%s: %s" % (e.__class__.__name__, e))
         raise IOError(0, "json.loads failed")
 
-    #logger.debug("Received: %s" % messages)
+    #logger.debug("messages: %s" % messages)
 
     if not 'username' in messages[0]:
         raise Exception("Message list did not contain username")
