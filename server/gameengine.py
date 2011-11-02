@@ -72,12 +72,12 @@ class Server:
             # The username is already taken, refuse connection
             self.logger.info("Refused connection from %s:%s, "
                     "username '%s' unavailable" %
-                    (address, username))
+                    (address[0], address[1], username))
 
             net.send(client, { 'accepted': False,
                                'reason': 'Username unavailable' })
-
-            self.disconnect_client(client, "Username unavailable")
+            
+            client.close()
 
             return False
 

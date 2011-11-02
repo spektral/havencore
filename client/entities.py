@@ -12,10 +12,14 @@ from os import path
 import logging
 
 import pygame
+from pygame import display
 from pygame.locals import *
 
 from jukebox import jukebox
 from graphics import *
+
+from entitylist import entity_container
+from entitylist import *
 
 __author__   = "Gustav Fahlén, Christofer Odén, Max Sidenstjärna"
 __credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
@@ -28,42 +32,45 @@ class Entity:
         self.x = x
         self.y = y
         self.r = r
+        self.alive = True
 
 
 class Vehicle:
-    def __init__(self, dict, filename, size):
+    def __init__(self, dict, sprite):
         self.__dict__ = dict
-        self.sprite = RotSprite(filename, (128,128))
         self.logger = logging.getLogger('client.entities.Vehicle')
+        self.sprite = RotSprite(sprite)
+        self.alive_locally = True
 
     def update(self):
-        if self.health <= 0:
+        if not self.alive and self.alive_locally:
             jukebox.play_sound('vehicle_boom')
             self.logger.info("%s died!" % self.player)
             self.health = 0
-            #filename = path.join(path.dirname(__file__), "/img/explosion2.png")
-            #gameengine.add_local(Explosion((self.x, self.y), filename
-                                           #(64, 64), 2))
-            self.alive = False
+            entity_container.append(LOCAL,
+                    Explosion((self.x, self.y),
+                              sprites['vehicle_explosion'], 10))
+            self.alive_locally = False
 
-        self.rot += self.torque
+        #self.rot += self.torque / 4.0
 
         while self.rot < 0.0:
             self.rot += 360.0
         while self.rot >= 360.0:
             self.rot -= 360.0
 
-        self.x += (self.vel * sin(radians(self.rot)))
-        self.y += (self.vel * cos(radians(self.rot)))
+#        self.x += (self.vel * sin(radians(self.rot))) / 2.0
+#        self.y += (self.vel * cos(radians(self.rot))) / 2.0
+#        self.x += (self.strafe_vel * sin(radians(self.rot + 90.0))) / 2.0
+#        self.y += (self.strafe_vel * cos(radians(self.rot + 90.0))) / 2.0
         self.sprite.set_direction(self.rot)
 
-    def draw(self, screen):
+    def draw(self):
+        screen = display.get_surface()
         self.sprite.draw(screen, self.x, self.y)
+
     def get_health(self):
         return self.health
-
-    def fire(self):
-        pass
 
     def __repr__(self):
         """Return a string representation of the instance."""
@@ -74,24 +81,31 @@ class Vehicle:
 
 class Missile:
 
-    """
-    Generic class for all projectiles in the game.
+    """Generic class for all projectiles in the game."""
 
-    """
-
-    def __init__(self, dict, filename, size):
+    def __init__(self, dict, sprite):
         self.__dict__ = dict
-        self.sprite = RotSprite(filename, size)
+        self.sprite = RotSprite(sprite)
         self.sprite.set_direction(self.rot)
+        self.alive_locally = True
 
     def handle_input(self, event):
         pass
 
     def update(self):
+        if not self.alive and self.alive_locally:
+            jukebox.play_sound('missile_boom')
+            entity_container.append(
+                    LOCAL,
+                    Explosion((self.x, self.y),
+                        sprites['missile_explosion'], 4))
+            self.alive_locally = False
+
         self.x += self.vel * sin(radians(self.rot))
         self.y += self.vel * cos(radians(self.rot))
 
-    def draw(self, screen):
+    def draw(self):
+        screen = display.get_surface()
         self.sprite.draw(screen, self.x, self.y)
 
     def __repr__(self):
@@ -102,9 +116,12 @@ class Missile:
 
 
 class Explosion(Entity):
-    def __init__(self, (x, y), filename, size, frame_delay):
-        Entity.__init__(self, (x, y), size[0] / 2) 
-        self.animation = animation.Animation(filename, size, frame_delay)
+
+    """Display an explosion, die when animation is finished"""
+
+    def __init__(self, (x, y), sprite, frame_delay):
+        Entity.__init__(self, (x, y), sprite['size'][0] / 2) 
+        self.animation = Animation(sprite, frame_delay)
         self.animation.loop = False
         self.is_collidable = False
     
@@ -116,8 +133,8 @@ class Explosion(Entity):
         if self.animation.finished == True:
             self.alive = False
 
-    def draw(self, screen):
+    def draw(self):
+        screen = display.get_surface()
         self.animation.draw(screen, self.x, self.y)
-
 
 # vim: ts=4 et tw=79 cc=+1

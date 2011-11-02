@@ -20,10 +20,17 @@ from common import net
 
 from entities import *
 
+from entitylist import entity_container
+from entitylist import *
+
+import graphics
+from graphics import sprites
+
 from defines import *
 from jukebox import jukebox
 from mapHandler import MapHandler
 from HUD import HUD
+
 __author__    = "Gustav Fahlén, Christofer Odén, Max Sidenstjärna"
 __credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
 __copyright__ = "Copyright 2011 Daladevelop"
@@ -48,8 +55,6 @@ class Connection:
         self.username = username
 
         self.addr = addr
-        #self.socket = socket(AF_INET, SOCK_STREAM)
-        #self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 
     def connect(self):
 
@@ -119,7 +124,12 @@ class GameEngine(object):
     """
 
     def initialize(self, username, addr):
-        """Initialize the game engine with screen resolution."""
+
+        """Initialize the game engine.
+        
+        Set up the main window, initialize a connection to a server and
+        initialize the base objects."""
+
         self.logger = logging.getLogger('client.gameengine.GameEngine')
         self.logger.info("Initializing client engine...")
 
@@ -128,40 +138,47 @@ class GameEngine(object):
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Haven Core")
 
-        jukebox.initialize()
-
         self.username = username
         self.connection = Connection(username, addr)
+
         self.map_handler = MapHandler(10000, 10000, 40)
-        self.entities = []
+
+        self.entities = entity_container
+
         self.HUD = HUD((250,650))
 
-    def add_entity(self, entity):
-        """Append a game object to the object list."""
-        self.entities.append(entity)
+        jukebox.initialize()
+        graphics.load_sprites()
 
     def start(self):
-        """Start the game engine."""
+
+        """Start the game engine.
+        
+        Establish the server connection, start the frame timer and
+        launch the main game loop."""
+
         self.logger.info("Starting client engine...")
         self.connection.connect()
         self.fps_clock = pygame.time.Clock()
 
         self.is_running = True
         while(self.is_running):
-            self.handle_input()
-            self.map_handler.update()
-            self.get_server_state()
+            self.handle_events()
+            self.update()
             self.draw()
             self.fps_clock.tick(50)
 
     def quit(self):
+
+        """Stop the game loop."""
+
         self.logger.info("Stopping client engine...")
         self.is_running = False
     
-    def handle_input(self):
+    def handle_events(self):
 
-        """Take input from the user and check for other events like
-        collisions."""
+        """Send user input to the server and handle client side events."""
+
         events = []
 
         for event in pygame.event.get():
@@ -181,21 +198,20 @@ class GameEngine(object):
         # Only bother to transmit events that matter
         if events:
             self.connection.transmit({ 'label': 'events', 'events': events })
-            
-            #for entity in self.entities:
-            #    entity.handle_input(event)
 
-        #for entity in self.entities:
-        #    entity.check_collisions(self.entities)
+    def update(self):
+
+        """Perform client side logic and fetch updates from server."""
+
+        self.map_handler.update()
+        self.get_server_state()
 
     def get_server_state(self):
 
-        """Get state from server and update the known entities."""
+        """Get state from server and update accordingly."""
 
         state_list = self.connection.get_state()
         #self.logger.debug("State List: %s" % state_list)
-        #if state_list:
-            #self.entities = []
 
         for state in state_list:
             for entity in state:
@@ -204,43 +220,44 @@ class GameEngine(object):
                 dict = entity['dict']
                 serial = dict['serial']
 
-                # Create objects that doesn't exist yet
-                if (serial not in [s.serial for s in self.entities]):
+                entity = self.entities.get_with_serial(serial, layer=SERVER)
 
+                # Create objects that doesn't exist yet
+                if not entity:
                     if name == 'Vehicle':
-                        self.entities.append(
-                                Vehicle(dict, "client/img/crawler_sprites.png",
-                                    (128, 128)))
+                        self.entities.append(SERVER,
+                                Vehicle(dict, sprites['vehicle']))
 
                     if name == 'Missile':
-                        self.entities.append(
-                                Missile(dict, "client/img/missile2.png",
-                                        (32, 32)))
+                        self.entities.append(SERVER,
+                                Missile(dict, sprites['missile']))
                         jukebox.play_sound('rocket')
+
                     if name == 'Block':
-                        print "Block"
+                        pass
+                        #print "Block"
                    #     self.mapHandler.change_color_at(
 
                 # If the object exists, update it with the new data
                 else:
-                    entity = filter(lambda x:x.serial == serial,
-                                    self.entities)[0]
                     entity.__dict__.update(dict)
 
-        for entity in self.entities:
-            entity.update()
+        self.entities.update()
 
         jukebox.update()
 
-        self.entities = filter(lambda x:x.alive, self.entities)
+        self.entities.clean_dead()
 
     def draw(self):
+
         """Draw stuff to the screen."""
+
         self.screen.fill((66, 66, 111))
         self.map_handler.draw(self.screen)
+
+        self.entities.draw()
+
         self.HUD.draw(self.screen)
-        for entity in self.entities:
-            entity.draw(self.screen)
 
         pygame.display.update()
 
