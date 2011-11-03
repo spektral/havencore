@@ -86,11 +86,6 @@ class Vehicle(Entity):
         self.torque = 0
         self.vel = 0
         self.strafe_vel = 0
-
-        # Fire control
-        self.is_firing = False
-        self.fire_delay = 25
-        self.cooldown = 0
         
         #some standard values
         self.speed = 1
@@ -103,6 +98,18 @@ class Vehicle(Entity):
         self.children = []
         self.logger.debug("HP: %s  Speed: %s" %
                           (self.health, self.speed))
+
+        self.init_weapons()
+
+    def init_weapons(self):
+        self.is_firing = False
+        self.fire_delay = 5
+        self.cooldown = 0
+
+        self.maxammo = 12
+        self.ammo = self.maxammo
+        self.reload_time = 150
+        self.reload_cooldown = 0
 
     def set_modules(self, modules):
         conn = sqlite3.connect('server/havencore.db')
@@ -188,23 +195,38 @@ class Vehicle(Entity):
         self.x += (self.strafe_vel * sin(radians(self.rot + 90.0))) / 2.0
         self.y += (self.strafe_vel * cos(radians(self.rot + 90.0))) / 2.0
 
-        # Fire control
-        self.cooldown -= 1
-        if self.cooldown < 0:
-            self.cooldown = 0
+        self.weapon_update()
 
-        if self.is_firing and self.cooldown == 0:
+    def weapon_update(self):
+
+        if self.cooldown > 0:
+            self.cooldown -= 1
+
+        if self.reload_cooldown > 0:
+            self.reload_cooldown -= 1
+            self.logger.info("Time until reload: %d" % self.reload_cooldown)
+            if self.reload_cooldown == 0:
+                self.ammo = self.maxammo
+
+        if self.is_firing and self.cooldown == 0 and self.ammo > 0:
             self.fire()
             self.cooldown = self.fire_delay
+            self.ammo -= 1
+            self.logger.info("Ammo: %d" % self.ammo)
+            if self.ammo == 0:
+                self.reload_cooldown = self.reload_time
 
     def fire(self):
+
         missile = Missile(self.player, (self.x, self.y), 12, self.rot,
                           (32, 32), self)
         gameengine.add_entity(missile) 
         self.children.append(missile)
 
     def __repr__(self):
+
         """Return a string representation of the instance."""
+
         return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
                 (self.__class__.__name__, self.alive, self.x, self.y,
                     self.rot, self.vel))
@@ -218,9 +240,9 @@ class Missile(Entity):
         """Initialize itself and it's base class."""
         Entity.__init__(self, player, (x, y), size[0] / 2)
         self.vel = vel
-        self.rot = rot + randint(-10, 10)
+        self.rot = rot + randint(-3, 3)
         self.parent = parent
-        self.max_age = randint(20, 50)
+        self.max_age = randint(48, 52)
 
     def handle_input(self, event):
         """Handle external manipulation."""
