@@ -4,6 +4,8 @@
 from math import floor, radians, sin, cos
 import logging
 
+from random import randint
+
 import pygame
 from pygame.locals import *
 
@@ -78,7 +80,7 @@ class Vehicle(Entity):
     def __init__(self, player, (x, y), rot, modules):
         self.logger = logging.getLogger('server.entities.Vehicle')
 
-        Entity.__init__(self, player, (x, y), 40)
+        Entity.__init__(self, player, (x, y), 60)
         self.rot = rot
         self.maxvel = 0
         self.torque = 0
@@ -86,7 +88,7 @@ class Vehicle(Entity):
         self.strafe_vel = 0
         
         #some standard values
-        self.speed = 5
+        self.speed = 1
 
         self.health = 100
        
@@ -96,6 +98,18 @@ class Vehicle(Entity):
         self.children = []
         self.logger.debug("HP: %s  Speed: %s" %
                           (self.health, self.speed))
+
+        self.init_weapons()
+
+    def init_weapons(self):
+        self.is_firing = False
+        self.fire_delay = 5
+        self.cooldown = 0
+
+        self.maxammo = 12
+        self.ammo = self.maxammo
+        self.reload_time = 150
+        self.reload_cooldown = 0
 
     def set_modules(self, modules):
         conn = sqlite3.connect('server/havencore.db')
@@ -126,13 +140,13 @@ class Vehicle(Entity):
                 self.strafe_vel += self.speed
 
             if event.key == K_LEFT:
-                self.torque += self.speed / 2.0
+                self.torque += self.speed
 
             if event.key == K_RIGHT:
-                self.torque -= self.speed / 2.0
+                self.torque -= self.speed
 
             if event.key == K_SPACE:
-                self.fire()
+                self.is_firing = True
 
         elif event.type == KEYUP:
             if event.key == K_w:
@@ -148,45 +162,71 @@ class Vehicle(Entity):
                 self.strafe_vel -= self.speed
 
             if event.key == K_LEFT:
-                self.torque -= self.speed / 2.0
+                self.torque -= self.speed
 
             if event.key == K_RIGHT:
-                self.torque += self.speed / 2.0
+                self.torque += self.speed
+
+            if event.key == K_SPACE:
+                self.is_firing = False
 
     def update(self):
         Entity.update(self)
 
         while self.collision_list:
             entity = self.collision_list.pop(0)
-            if not entity in self.children \
-                    and isinstance(entity, Missile):
-                self.health -= 40
+            if not entity in self.children and isinstance(entity, Missile):
+                self.health -= 5
 
         self.children = [c for c in self.children if c.alive]
 
 
         if self.health <= 0:
             self.alive = False
-        self.rot += self.torque
+        self.rot += self.torque / 4.0
 
         while self.rot < 0.0:
             self.rot += 360.0
         while self.rot >= 360.0:
             self.rot -= 360.0
 
-        self.x += (self.vel * sin(radians(self.rot)))
-        self.y += (self.vel * cos(radians(self.rot)))
-        self.x += (self.strafe_vel * sin(radians(self.rot + 90.0)))
-        self.y += (self.strafe_vel * cos(radians(self.rot + 90.0)))
+        self.x += (self.vel * sin(radians(self.rot))) / 2.0
+        self.y += (self.vel * cos(radians(self.rot))) / 2.0
+        self.x += (self.strafe_vel * sin(radians(self.rot + 90.0))) / 2.0
+        self.y += (self.strafe_vel * cos(radians(self.rot + 90.0))) / 2.0
+
+        self.weapon_update()
+
+    def weapon_update(self):
+
+        if self.cooldown > 0:
+            self.cooldown -= 1
+
+        if self.reload_cooldown > 0:
+            self.reload_cooldown -= 1
+            self.logger.info("Time until reload: %d" % self.reload_cooldown)
+            if self.reload_cooldown == 0:
+                self.ammo = self.maxammo
+
+        if self.is_firing and self.cooldown == 0 and self.ammo > 0:
+            self.fire()
+            self.cooldown = self.fire_delay
+            self.ammo -= 1
+            self.logger.info("Ammo: %d" % self.ammo)
+            if self.ammo == 0:
+                self.reload_cooldown = self.reload_time
 
     def fire(self):
+
         missile = Missile(self.player, (self.x, self.y), 12, self.rot,
                           (32, 32), self)
         gameengine.add_entity(missile) 
         self.children.append(missile)
 
     def __repr__(self):
+
         """Return a string representation of the instance."""
+
         return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
                 (self.__class__.__name__, self.alive, self.x, self.y,
                     self.rot, self.vel))
@@ -200,8 +240,9 @@ class Missile(Entity):
         """Initialize itself and it's base class."""
         Entity.__init__(self, player, (x, y), size[0] / 2)
         self.vel = vel
-        self.rot = rot
+        self.rot = rot + randint(-3, 3)
         self.parent = parent
+        self.max_age = randint(48, 52)
 
     def handle_input(self, event):
         """Handle external manipulation."""
@@ -212,7 +253,7 @@ class Missile(Entity):
         """Do logic, react to collisions, move."""
 
         Entity.update(self)
-        if self.age > 50:
+        if self.age > self.max_age:
             self.alive = False
 
         for entity in self.collision_list:

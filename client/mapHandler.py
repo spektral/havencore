@@ -20,7 +20,7 @@ class MapCamera:
         pass
     def handle_input(self, event):
         pass
-    
+
 class MapHandler:
     def __init__(self,width, height, blockSize):
         self.screen = 0
@@ -31,12 +31,12 @@ class MapHandler:
         self.init_blockList()
         self.init_adjacent()
         self.speed = (0,0)
-        self.first = 1 
+        self.first = 1
         self.offset = (0,0)
         # for painting and illustrating of algorithms:
         self.illustrate = True
         self.delay = DELAY
-        self.changed = self.blockList 
+        self.changed = self.blockList
 
     def set_screen(self, screen):
         self.screen = screen
@@ -49,7 +49,7 @@ class MapHandler:
     def update(self):
         self.offset = (self.speed[0] + self.offset[0], self.speed[1] + self.offset[1])
     def handle_input(self,event = 0):
-        print pygame.mouse.get_pos()[0]
+        #print pygame.mouse.get_pos()[0]
         if pygame.mouse.get_pos()[0] < 50:
             self.speed = (10, 0)
         if pygame.mouse.get_pos()[0] > 400:
@@ -59,14 +59,14 @@ class MapHandler:
         if event.type == pygame.MOUSEBUTTONDOWN:
             pass
             #self.start = self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
-            
+
             #paint all colliding.
             #collider =self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
             #collider.check_collisions(self.blockList)
             #for colliding in collider.collision_list:
             #    colliding.set_color(red)
 
-       
+
        # if event.type == pygame.MOUSEBUTTONUP:
         #    self.end = self.get_block_at(self.get_block_index(pygame.mouse.get_pos()))
             #elf.calc_path(self.start, self.end)
@@ -80,45 +80,46 @@ class MapHandler:
       #  for block in self.blockList:
             #block.check_collisions(self.blockList)
            # block.set_adjacent_list(block.get_colliders())
-        print "wtf.."
+        #print "wtf.."
+        pass
     def get_block_at(self,i):
-            return self.blockList[i]
+        return self.blockList[i]
     def get_block_at(self, (x,y)):
-            return self.blockList[self.get_block_index((x,y))]
-    def get_block_index(self, (x,y)): 
+        return self.blockList[self.get_block_index((x,y))]
+    def get_block_index(self, (x,y)):
         return ((y/self.blockSize)*(self.width/self.blockSize)) + (x/self.blockSize)# +( y/self.blockSize)
-       
+
     def right_pos(self,(x,y)):
         return ((x/self.blockSize)*self.blockSize,(y/self.blockSize)*self.blockSize)
-        
-   
+
+
    # Refactaway?
-    def fill_correct(self): 
+    def fill_correct(self):
         self.blockList[self.get_block_index(pygame.mouse.get_pos())].setColor(colorList[0])
     def random_fill(self):
         #self.blockList[0].setColor(red)
         self.changed.append(random.choice(self.blockList))
         self.changed[len(self.changed)-1].set_color(random.choice(colorList))
         #random.choice(self.blockList).setColor(random.choice(colorList))
-        
+
     def draw(self, screen):
         # HACK
         self.screen = screen
         self.random_fill()
-     
+
         self.draw_board(screen)
         # this will n
-        for c in self.changed: 
+        for c in self.changed:
             c.draw(screen, self.offset[0], self.offset[1])
         #HACK
         if self.first == 1:
             self.changed = []
             self.first = 0
-    
+
     def update_all(self):
         self.changed = self.blockList
-    
-    def draw_board(self,screen):    
+
+    def draw_board(self,screen):
         p = 0
         for i in range(0, self.width/self.blockSize):
             pygame.draw.line(screen, red, (p+self.offset[0], 0+self.offset[1]),
@@ -129,23 +130,23 @@ class MapHandler:
             pygame.draw.line(screen, red, (0+self.offset[0],p+self.offset[1]),
                     (self.width,p), 1)
             p = p+self.blockSize
-               
+
     def remove_colliding(self, block):
-            for t in self.blockList:
-                if block.x == t.x and block.y == t.y:
-                    self.blockList.remove(t)
-                    
+        for t in self.blockList:
+            if block.x == t.x and block.y == t.y:
+                self.blockList.remove(t)
+
     def change_color_at(self, (x,y), color):
         self.changed.append(self.blockList[self.get_block_index((x,y))])
         self.get_block_index((x,y)).change_color(color)
-    
+
     def get_width(self):
         return self.width
     def get_height(self):
         return self.height
     def get_block_size(self):
         return self.blockSize
-    def get_block_list(self):    
+    def get_block_list(self):
         return self.blockList
     def is_walkable(self, (x,y)):
         return self.get_block_at(self.get_block_index(x,y)).is_walkable()
@@ -155,7 +156,7 @@ class MapHandler:
    # def loadMap(self, filename):
   #      f = FileHandler()
    #     self.blockList = f.readFile("out.txt")
-        
+
     #    selfinit_adjacent()
     #    self.changed = self.blockList
     def testCalc(self):
@@ -171,7 +172,7 @@ class MapHandler:
         self.beforeList = list(self.blockList) #save the old list...
         endBlock.set_color(pink)
         s = startBlock
-        #self.openList.append(startBlock) 
+        #self.openList.append(startBlock)
         tid = time.clock()
         t = self.a_star(startBlock,endBlock)
 
@@ -179,7 +180,7 @@ class MapHandler:
         tid =  time.clock() - tid
        # print tid
         i = t
-        
+
         illuList = []
         while t != s:
             if t == None:
@@ -187,32 +188,32 @@ class MapHandler:
             t.set_color(pink)
             illuList.append(t)
             t = t.getParent()
-            
+
         s.set_color(pink)
         illuList.append(s)
         illuList.reverse()
         for block in illuList:
-             block.draw(self.screen)
-             pygame.display.flip()
-             #time.sleep(self.delay)
-             
+            block.draw(self.screen)
+            pygame.display.flip()
+            #time.sleep(self.delay)
+
         return i
-    
-    
- 
+
+
+
     def a_star(self, startBlock, endBlock):
         closedList = []
         openList = []
         came_from = "the empty map?" # :D
         openList.append(startBlock)
-        
+
         #startBlock.setH(self.calc_manhattan(startBlock, endBlock))
         #startBlock.setF(startBlock.getG()+startBlock.getH())
         startBlock.setG(0)
         while len(openList) != 0:
-            
+
             self.calc_heuristic(openList, endBlock)
-            
+
             x = openList[0] # BEST BLOCK, HACK
             for block in openList:
                 block.setG(startBlock.getG()+10)
@@ -221,12 +222,12 @@ class MapHandler:
                     x = block
             if x == endBlock:
                 return x
-            
+
             closedList.append(x)
             openList.remove(x)
             self.calc_heuristic(x.get_adjacent_list(),endBlock)
             for block in x.get_adjacent_list():
-                
+
                 if block in closedList or block.is_walkable() == 0:
                     continue
                 tentativeG = block.getG()+x.getG() # 10pts for the move
@@ -241,22 +242,22 @@ class MapHandler:
                     block.setG(tentativeG)
                     block.set_h(self.calc_manhattan(block,endBlock))
                     block.setF(block.getG()+block.getH())
-      
-        
-           
+
+
+
        #return self.recSearch(
-        
-    
+
+
     def calc_heuristic(self, blockSet, endBlock):
         for block in blockSet:
             block.set_h(self.calc_manhattan(block, endBlock))
-            
+
     # CALC H THE MANHATTAN WAY
     def calc_manhattan(self, startBlock, endBlock):
        #FIXED ALOT BY DIVIDE
         return 10*(abs(startBlock.getX()/self.width-endBlock.getX()/self.width) + abs(startBlock.getY()/self.height-endBlock.getY()/self.height))
-       
-          
+
+
     #NOT WORKING YET
     def dijkstra(self,startBlock, endBlock):
         graph = self.blockList
@@ -265,10 +266,10 @@ class MapHandler:
             vertex.setF(inf)
             vertex.setParent(0)
         startBlock.setF(0)
-        
+
         Q = graph
         while len(Q) != 0:
-            
+
             u = Q[0]
             for vertex in Q:
                 if vertex.getF() < u.getF():
@@ -287,7 +288,7 @@ class MapHandler:
                         Q.remove(v)
                     if v == endBlock:
                         return v
-        
-        
 
-# vim: ts=4 et tw=79 cc=79 
+
+
+# vim: ts=4 et tw=79 cc=79

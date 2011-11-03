@@ -6,6 +6,7 @@ Module for purely visual stuff.
 
 """
 
+from os import path
 from math import floor
 
 import pygame
@@ -21,7 +22,7 @@ class Animation:
 
     """Class for handling sprite animation"""
 
-    def __init__(self, filename, frame_size, delay=0):
+    def __init__(self, sprite, delay=0):
         self.current_frame = 0
         self.ticker = 0
         self.delay = delay
@@ -29,7 +30,7 @@ class Animation:
         self.loop = True
         self.finished = False
 
-        self.load_image(filename, frame_size)
+        self.load_image(sprite['filename'], sprite['size'])
 
     def play(self):
         self.running = True
@@ -91,6 +92,27 @@ class RotSprite(Animation):
         slice_size = (self.frame_count / 360.0)
         index = int(floor(slice_size * (angle))) % self.frame_count
         return index
+
+
+def add_sprite(name, filename, size):
+
+    """Add a sprite to the sprite container"""
+
+    basedir = path.join(path.dirname(__file__), 'img')
+    sprites[name] = {
+            'filename': path.join(basedir, filename),
+            'size': size
+            }
+
+
+def load_sprites():
+    add_sprite('vehicle',           'crawler_sprites.png', (128, 128))
+    add_sprite('missile',           'missile2.png',        (32, 32))
+    add_sprite('vehicle_explosion', 'blast.png',           (96, 96))
+    add_sprite('missile_explosion', 'explosion2.png',      (64, 64))
+
+
+sprites = {}
 
 
 # vim: ts=4 et tw=79 cc=+1
