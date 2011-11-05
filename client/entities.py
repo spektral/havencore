@@ -103,6 +103,7 @@ class Missile:
 
         self.x += self.vel * sin(radians(self.rot))
         self.y += self.vel * cos(radians(self.rot))
+        self.sprite.set_direction(self.rot)
 
     def draw(self):
         screen = display.get_surface()

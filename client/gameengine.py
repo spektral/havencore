@@ -194,6 +194,12 @@ class GameEngine(object):
 
             if event.type in (KEYDOWN, KEYUP):
                 events.append({ 'type': event.type, 'key': event.key })
+            
+            if event.type in (MOUSEBUTTONDOWN, MOUSEBUTTONUP):
+                events.append({ 'type': event.type,
+                                'button': event.button,
+                                'pos': event.pos })
+                self.logger.debug(repr(events[-1]))
 
         # Only bother to transmit events that matter
         if events:
@@ -228,7 +234,7 @@ class GameEngine(object):
                         self.entities.append(SERVER,
                                 Vehicle(dict, sprites['vehicle']))
 
-                    if name == 'Missile':
+                    if name in ('Missile', 'HomingMissile'):
                         self.entities.append(SERVER,
                                 Missile(dict, sprites['missile']))
                         jukebox.play_sound('rocket')
