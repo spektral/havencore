@@ -125,6 +125,7 @@ class Vehicle(Entity):
 
     def init_weapons(self):
         self.is_firing = False
+        self.is_firing_sec = False
         self.fire_delay = 5
         self.cooldown = 0
 
@@ -176,9 +177,23 @@ class Vehicle(Entity):
 
             if event.key == K_1:
                 self.weapon = Missile
+                print "Change to Missile"
 
             if event.key == K_2:
                 self.weapon = HomingMissile
+
+            if event.key == K_3:
+                self.weapon = Machinegun
+                print "Change to Machinegun"
+
+            if event.key == K_g:
+                print "Planting LandMine"
+                #FIXME: Landmine outside the vheicle and from back
+                landmine = LandMine(self.player, (self.x + 50, self.y + 50), 
+                        self.turret_rot, (20, 20), self)
+                gameengine.add_entity(landmine) 
+                self.children.append(landmine)
+
 
         elif event.type == KEYUP:
             if event.key == K_w:
@@ -208,12 +223,15 @@ class Vehicle(Entity):
             if event.button == 1:
                 self.is_firing = True
                 self.turret_rot = look_at((self.x, self.y), event.pos)
-
+            if event.button == 2:
+                self.is_firing = True
+                self.turret_rot = look_at((self.x, self.y), event.pos)
 
         elif event.type == MOUSEBUTTONUP:
             if event.button == 1:
                 self.is_firing = False
-
+            if event.button == 2:
+                self.is_firing = False
 
     def update(self):
         Entity.update(self)
@@ -241,7 +259,7 @@ class Vehicle(Entity):
         self.y += (self.strafe_vel * cos(radians(self.rot + 90.0))) / 2.0
 
         self.weapon_update()
-
+        
     def weapon_update(self):
 
         if self.cooldown > 0:
@@ -254,20 +272,23 @@ class Vehicle(Entity):
                 self.ammo = self.maxammo
 
         if self.is_firing and self.cooldown == 0 and self.ammo > 0:
+           
             self.fire()
+
             self.cooldown = self.fire_delay
             self.ammo -= 1
             self.logger.info("Ammo: %d" % self.ammo)
             if self.ammo == 0:
                 self.reload_cooldown = self.reload_time
 
+#FIXME: Size on object so maching machinegun bullets.
     def fire(self):
 
         missile = self.weapon(self.player, (self.x, self.y),
                 self.turret_rot, (32, 32), self)
         gameengine.add_entity(missile) 
         self.children.append(missile)
-
+    
 #    def __repr__(self):
 #
 #        """Return a string representation of the instance."""
@@ -313,6 +334,70 @@ class Missile(Entity):
         return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
                 (self.__class__.__name__, self.alive, self.x, self.y,
                     self.rot, self.vel))
+
+class Machinegun(Entity):
+
+    """Generic class for Machingun bullets in the game."""
+
+    def __init__(self, player, (x, y), rot, size, parent):
+        Entity.__init__(self, player, (x, y), size[0] / 2)
+        self.vel = 15
+        self.rot = rot + randint(-3, 3)
+        self.parent = parent
+        self.max_age = randint(48, 52)
+
+    def handle_input(self, event):
+        pass
+
+    def update(self):
+
+        Entity.update(self)
+        if self.age > self.max_age:
+            self.alive = False
+
+        for entity in self.collision_list:
+            if entity is not self.parent:
+                self.alive = False
+
+        self.x += self.vel * sin(radians(self.rot))
+        self.y += self.vel * cos(radians(self.rot))
+
+    def __repr__(self):
+        return('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
+                (self.__class__.__name__, self.alive, self.x, self.y,
+                    self.rot, self.vel))
+
+
+class LandMine(Entity):
+    
+    """Generic class for all LandMines in the game."""
+
+    #FIXME: Trolla bort parameter rot
+    def __init__(self, player, (x, y), rot, size, parent):
+        Entity.__init__(self, player, (x, y), size[0] / 2)
+        self.parent = parent
+        self.vel = 0                    #FIXME: Trolla bort!
+        self.rot = rot + randint(-3, 3) #FIXME: Trolla bort!
+        self.max_age = 10000 #randint(48, 52)
+
+    def handle_input(self, event):
+        pass
+
+    def update(self):
+        Entity.update(self)
+
+        if self.age > self.max_age:
+            self.alive = False
+
+        for entity in self.collision_list:
+            #if entity is not self.parent:
+            self.alive = False
+
+    def __repr__(self):
+        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
+                (self.__class__.__name__, self.alive, self.x, self.y,
+                    self.rot, self.vel))
+
 
 class HomingMissile(Missile):
 

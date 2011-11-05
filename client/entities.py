@@ -116,6 +116,62 @@ class Missile:
                     self.rot, self.vel))
 
 
+class Machinegun:
+
+    """Generic class for Machingun bullets in the game."""
+
+    def __init__(self, dict):
+        self.__dict__ = dict
+        self.alive_locally = True
+
+    def handle_input(self):
+        pass
+
+    def update(self):
+        if not self.alive and self.alive_locally:
+            self.alive_locally = False
+
+        self.x += self.vel * sin(radians(self.rot))
+        self.y += self.vel * cos(radians(self.rot))
+
+    def draw(self):
+        screen = display.get_surface()
+        pygame.draw.circle(screen, (0,0,0), (self.x,self.y), 2)
+
+    def __repr__(self):
+        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
+                (self.__class__.__name__, self.alive, self.x, self.y,
+                    self.rot, self.vel))
+
+class LandMine:
+
+    """Generic class for all LandMines in the game."""
+
+    def __init__(self, dict):
+        self.__dict__ = dict
+        self.alive_locally = True
+
+    def handle_input(self):
+        pass
+
+    def update(self):
+        if not self.alive and self.alive_locally:
+            jukebox.play_sound('missile_boom')
+            entity_container.append(
+                    LOCAL,
+                    Explosion((self.x, self.y),
+                        sprites['missile_explosion'], 4))
+            self.alive_locally = False
+
+    def draw(self):
+        screen = display.get_surface()
+        pygame.draw.circle(screen, (0,142,250), (self.x,self.y), 10)
+
+    def __repr__(self):
+        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
+                (self.__class__.__name__, self.alive, self.x, self.y,
+                    self.rot, self.vel))
+
 class Explosion(Entity):
 
     """Display an explosion, die when animation is finished"""

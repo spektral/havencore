@@ -239,6 +239,14 @@ class GameEngine(object):
                                 Missile(dict, sprites['missile']))
                         jukebox.play_sound('rocket')
 
+                    if name == 'Machinegun':
+                        self.entities.append(SERVER,
+                                Machinegun(dict))
+
+                    if name == 'LandMine':
+                        self.entities.append(SERVER,
+                                LandMine(dict))
+
                     if name == 'Block':
                         pass
                         #print "Block"
