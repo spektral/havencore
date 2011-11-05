@@ -1,7 +1,7 @@
 #!/usr/bin/python2 -tt
 # -*- coding: utf-8 -*-
 
-from math import floor, radians, sin, cos
+from math import *
 import logging
 
 from random import randint
@@ -16,6 +16,26 @@ __author__    = "Gustav Fahlén, Max Sidenstjärna, Christofer Odén"
 __credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
 __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
+
+
+def look_at((eye_x, eye_y), (tgt_x, tgt_y)):
+
+    """Calculate the angle of a vector"""
+
+    nx = tgt_x - eye_x
+    ny = tgt_y - eye_y
+
+    cx, cy = (0, 1)
+
+    norm = sqrt(nx * nx + ny * ny)
+    (nx, ny) = (nx / norm, ny / norm)
+
+    dot = nx * cx + ny * cy
+
+    if nx < 0:
+        return degrees(acos(-dot)) + 180
+    else:
+        return degrees(acos(dot))
 
 
 class Entity(object):
@@ -50,7 +70,8 @@ class Entity(object):
                   'dict': dict(self.__dict__) }
 
         # Weed out unnecessary fields
-        blacklist = ['children', 'parent', 'collision_list', 'logger']
+        blacklist = ['children', 'parent', 'collision_list', 'logger',
+                'target', 'weapon']
 
         for item in blacklist:
             try:
@@ -100,6 +121,7 @@ class Vehicle(Entity):
                           (self.health, self.speed))
 
         self.init_weapons()
+        self.weapon = Missile
 
     def init_weapons(self):
         self.is_firing = False
@@ -108,8 +130,10 @@ class Vehicle(Entity):
 
         self.maxammo = 12
         self.ammo = self.maxammo
-        self.reload_time = 150
+        self.reload_time = 100
         self.reload_cooldown = 0
+
+        self.turret_rot = 0
 
     def set_modules(self, modules):
         conn = sqlite3.connect('server/havencore.db')
@@ -134,10 +158,12 @@ class Vehicle(Entity):
                 self.vel -= self.speed
 
             if event.key == K_d:
-                self.strafe_vel -= self.speed
+                self.torque -= self.speed
+                #self.strafe_vel -= self.speed
 
             if event.key == K_a:
-                self.strafe_vel += self.speed
+                self.torque += self.speed
+                #self.strafe_vel += self.speed
 
             if event.key == K_LEFT:
                 self.torque += self.speed
@@ -148,6 +174,12 @@ class Vehicle(Entity):
             if event.key == K_SPACE:
                 self.is_firing = True
 
+            if event.key == K_1:
+                self.weapon = Missile
+
+            if event.key == K_2:
+                self.weapon = HomingMissile
+
         elif event.type == KEYUP:
             if event.key == K_w:
                 self.vel -= self.speed
@@ -156,10 +188,12 @@ class Vehicle(Entity):
                 self.vel += self.speed
 
             if event.key == K_d:
-                self.strafe_vel += self.speed
+                self.torque += self.speed
+                #self.strafe_vel += self.speed
 
             if event.key == K_a:
-                self.strafe_vel -= self.speed
+                self.torque -= self.speed
+                #self.strafe_vel -= self.speed
 
             if event.key == K_LEFT:
                 self.torque -= self.speed
@@ -169,6 +203,17 @@ class Vehicle(Entity):
 
             if event.key == K_SPACE:
                 self.is_firing = False
+
+        elif event.type == MOUSEBUTTONDOWN:
+            if event.button == 1:
+                self.is_firing = True
+                self.turret_rot = look_at((self.x, self.y), event.pos)
+
+
+        elif event.type == MOUSEBUTTONUP:
+            if event.button == 1:
+                self.is_firing = False
+
 
     def update(self):
         Entity.update(self)
@@ -218,28 +263,28 @@ class Vehicle(Entity):
 
     def fire(self):
 
-        missile = Missile(self.player, (self.x, self.y), 12, self.rot,
-                          (32, 32), self)
+        missile = self.weapon(self.player, (self.x, self.y),
+                self.turret_rot, (32, 32), self)
         gameengine.add_entity(missile) 
         self.children.append(missile)
 
-    def __repr__(self):
-
-        """Return a string representation of the instance."""
-
-        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
-                (self.__class__.__name__, self.alive, self.x, self.y,
-                    self.rot, self.vel))
+#    def __repr__(self):
+#
+#        """Return a string representation of the instance."""
+#
+#        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
+#                (self.__class__.__name__, self.alive, self.x, self.y,
+#                    self.rot, self.vel))
 
 
 class Missile(Entity):
 
     """Generic class for all projectiles in the game."""
 
-    def __init__(self, player, (x, y), vel, rot, size, parent):
+    def __init__(self, player, (x, y), rot, size, parent):
         """Initialize itself and it's base class."""
         Entity.__init__(self, player, (x, y), size[0] / 2)
-        self.vel = vel
+        self.vel = 15
         self.rot = rot + randint(-3, 3)
         self.parent = parent
         self.max_age = randint(48, 52)
@@ -269,5 +314,31 @@ class Missile(Entity):
                 (self.__class__.__name__, self.alive, self.x, self.y,
                     self.rot, self.vel))
 
+class HomingMissile(Missile):
+
+    """A missile that seeks out the closest target"""
+
+    def __init__(self, player, (x, y), rot, size, parent):
+        Missile.__init__(self, player, (x, y), rot, size, parent)
+        self.vel = 6
+        self.rot = rot
+        self.max_age = 1000
+
+        distances = []
+        for entity in filter(lambda x:x.player != self.player,
+                                          gameengine.entities):
+            dx, dy = self.x - entity.x, self.y - entity.y
+            distances.append((dx + dy, entity))
+
+        if not distances:
+            self.target = None
+        else:
+            self.target = min(distances)[1]
+
+    def update(self):
+        if self.target:
+            self.rot = look_at((self.x, self.y), (self.target.x, self.target.y))
+
+        Missile.update(self)
 
 # vim: ts=4 et tw=79 cc=+1
