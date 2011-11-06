@@ -60,6 +60,9 @@ class Entity(object):
     def update(self):
         self.age += 1
 
+    def handle_input(self, event):
+        pass
+
     def get_state(self):
 
         """Return a dictionary representation of the instance."""
@@ -121,9 +124,12 @@ class Vehicle(Entity):
                           (self.health, self.speed))
 
         self.init_weapons()
-        self.weapon = Missile
+        self.weapon = Rocket
 
     def init_weapons(self):
+
+        """Initialize member data belonging to weapons"""
+
         self.is_firing = False
         self.is_firing_sec = False
         self.fire_delay = 5
@@ -151,6 +157,9 @@ class Vehicle(Entity):
                     self.health += module[2]
 
     def handle_input(self, event):
+
+        """Handle player input"""
+
         if event.type == KEYDOWN:
             if event.key == K_w:
                 self.vel += self.speed
@@ -166,33 +175,24 @@ class Vehicle(Entity):
                 self.torque += self.speed
                 #self.strafe_vel += self.speed
 
-            if event.key == K_LEFT:
-                self.torque += self.speed
-
-            if event.key == K_RIGHT:
-                self.torque -= self.speed
-
             if event.key == K_SPACE:
                 self.is_firing = True
 
             if event.key == K_1:
-                self.weapon = Missile
-                print "Change to Missile"
+                self.weapon = Rocket
+                self.logger.debug("Weapon: Rocket")
 
             if event.key == K_2:
                 self.weapon = HomingMissile
+                self.logger.debug("Weapon: Homing Missile")
 
             if event.key == K_3:
-                self.weapon = Machinegun
-                print "Change to Machinegun"
+                self.weapon = MgBullet
+                self.logger.debug("Weapon: Machinegun")
 
-            if event.key == K_g:
-                print "Planting LandMine"
-                #FIXME: Landmine outside the vheicle and from back
-                landmine = LandMine(self.player, (self.x + 50, self.y + 50), 
-                        self.turret_rot, (20, 20), self)
-                gameengine.add_entity(landmine) 
-                self.children.append(landmine)
+            if event.key == K_4:
+                self.weapon = LandMine
+                self.logger.debug("Weapon: LandMine")
 
 
         elif event.type == KEYUP:
@@ -209,12 +209,6 @@ class Vehicle(Entity):
             if event.key == K_a:
                 self.torque -= self.speed
                 #self.strafe_vel -= self.speed
-
-            if event.key == K_LEFT:
-                self.torque -= self.speed
-
-            if event.key == K_RIGHT:
-                self.torque += self.speed
 
             if event.key == K_SPACE:
                 self.is_firing = False
@@ -281,139 +275,121 @@ class Vehicle(Entity):
             if self.ammo == 0:
                 self.reload_cooldown = self.reload_time
 
-#FIXME: Size on object so maching machinegun bullets.
     def fire(self):
 
-        missile = self.weapon(self.player, (self.x, self.y),
-                self.turret_rot, (32, 32), self)
+        missile = self.weapon(self, (self.x, self.y), self.turret_rot)
         gameengine.add_entity(missile) 
         self.children.append(missile)
     
-#    def __repr__(self):
-#
-#        """Return a string representation of the instance."""
-#
-#        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
-#                (self.__class__.__name__, self.alive, self.x, self.y,
-#                    self.rot, self.vel))
+    def __repr__(self):
+
+        """Return a string representation of the instance."""
+
+        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
+                (self.__class__.__name__, self.alive, self.x, self.y,
+                    self.rot, self.vel))
 
 
 class Missile(Entity):
 
     """Generic class for all projectiles in the game."""
 
-    def __init__(self, player, (x, y), rot, size, parent):
-        """Initialize itself and it's base class."""
-        Entity.__init__(self, player, (x, y), size[0] / 2)
-        self.vel = 15
-        self.rot = rot + randint(-3, 3)
-        self.parent = parent
-        self.max_age = randint(48, 52)
+    def __init__(self, parent, pos, rot, vel, size, max_age):
 
-    def handle_input(self, event):
-        """Handle external manipulation."""
-        pass
+        Entity.__init__(self, parent.player, pos, size[0] / 2)
+        self.vel = vel
+        self.rot = rot
+        self.parent = parent
+        self.max_age = max_age
 
     def update(self):
 
         """Do logic, react to collisions, move."""
 
         Entity.update(self)
+
         if self.age > self.max_age:
             self.alive = False
 
-        for entity in self.collision_list:
-            if entity is not self.parent:
-                self.alive = False
+        self.on_collision()
 
         self.x += self.vel * sin(radians(self.rot))
         self.y += self.vel * cos(radians(self.rot))
 
+    def on_collision(self):
+
+        for entity in self.collision_list:
+            if entity is not self.parent:
+                self.alive = False
+                break
+
     def __repr__(self):
+
         """Return a string representation of the instance."""
+
         return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
                 (self.__class__.__name__, self.alive, self.x, self.y,
                     self.rot, self.vel))
 
-class Machinegun(Entity):
 
-    """Generic class for Machingun bullets in the game."""
+class Rocket(Missile):
 
-    def __init__(self, player, (x, y), rot, size, parent):
-        Entity.__init__(self, player, (x, y), size[0] / 2)
-        self.vel = 15
-        self.rot = rot + randint(-3, 3)
-        self.parent = parent
-        self.max_age = randint(48, 52)
+    """A dumb rocket propelled warhead."""
 
-    def handle_input(self, event):
-        pass
+    def __init__(self, parent, (x, y), rot):
 
-    def update(self):
-
-        Entity.update(self)
-        if self.age > self.max_age:
-            self.alive = False
-
-        for entity in self.collision_list:
-            if entity is not self.parent:
-                self.alive = False
-
-        self.x += self.vel * sin(radians(self.rot))
-        self.y += self.vel * cos(radians(self.rot))
-
-    def __repr__(self):
-        return('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
-                (self.__class__.__name__, self.alive, self.x, self.y,
-                    self.rot, self.vel))
+        Missile.__init__(self, parent, (x, y), rot + randint(-3, 3),
+                vel=15, size=(32, 32), max_age=randint(48,52))
 
 
-class LandMine(Entity):
+class MgBullet(Missile):
+
+    """A dumb kinetic projectile"""
+
+    def __init__(self, parent, (x, y), rot):
+
+        Missile.__init__(self, parent, (x, y),
+                rot=rot+randint(-3, 3), vel=50, size=(1, 1), max_age=100)
+
+
+class LandMine(Missile):
     
-    """Generic class for all LandMines in the game."""
+    """An explosive charge detonating on proximity of an enemy"""
 
-    #FIXME: Trolla bort parameter rot
-    def __init__(self, player, (x, y), rot, size, parent):
-        Entity.__init__(self, player, (x, y), size[0] / 2)
-        self.parent = parent
-        self.vel = 0                    #FIXME: Trolla bort!
-        self.rot = rot + randint(-3, 3) #FIXME: Trolla bort!
-        self.max_age = 10000 #randint(48, 52)
+    def __init__(self, parent, (x, y), rot):
 
-    def handle_input(self, event):
-        pass
+        """Take into account the rotation of the vehicle that plants
+        the landmine, and adjust the position so that it appears behind
+        it."""
 
-    def update(self):
-        Entity.update(self)
+        Missile.__init__(self, parent, (x, y),
+                rot=0, vel=0, size=(3, 3), max_age=10000)
+        self.x -= (6 + parent.r) * sin(radians(parent.rot))
+        self.y -= (6 + parent.r) * cos(radians(parent.rot))
 
-        if self.age > self.max_age:
+    def on_collision(self):
+
+        """Don't discriminate between enemies and friendly when
+        detonating."""
+
+        if self.collision_list:
             self.alive = False
-
-        for entity in self.collision_list:
-            #if entity is not self.parent:
-            self.alive = False
-
-    def __repr__(self):
-        return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
-                (self.__class__.__name__, self.alive, self.x, self.y,
-                    self.rot, self.vel))
 
 
 class HomingMissile(Missile):
 
     """A missile that seeks out the closest target"""
 
-    def __init__(self, player, (x, y), rot, size, parent):
-        Missile.__init__(self, player, (x, y), rot, size, parent)
-        self.vel = 6
-        self.rot = rot
-        self.max_age = 1000
+    def __init__(self, parent, (x, y), rot):
+        Missile.__init__(self, parent, (x, y),
+                rot, vel=6, size=(32,32), max_age=500)
 
+        # Acquire a target
         distances = []
         for entity in filter(lambda x:x.player != self.player,
                                           gameengine.entities):
             dx, dy = self.x - entity.x, self.y - entity.y
-            distances.append((dx + dy, entity))
+            distances.append((dx*dx + dy*dy, entity))
 
         if not distances:
             self.target = None
@@ -422,8 +398,10 @@ class HomingMissile(Missile):
 
     def update(self):
         if self.target:
-            self.rot = look_at((self.x, self.y), (self.target.x, self.target.y))
+            self.rot = look_at((self.x, self.y),
+                               (self.target.x, self.target.y))
 
         Missile.update(self)
+
 
 # vim: ts=4 et tw=79 cc=+1

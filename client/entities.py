@@ -136,7 +136,7 @@ class Machinegun:
 
     def draw(self):
         screen = display.get_surface()
-        pygame.draw.circle(screen, (0,0,0), (self.x,self.y), 2)
+        pygame.draw.circle(screen, (0,0,0), (int(self.x + 0.5),int(self.y + 0.5)), 2)
 
     def __repr__(self):
         return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
@@ -165,7 +165,7 @@ class LandMine:
 
     def draw(self):
         screen = display.get_surface()
-        pygame.draw.circle(screen, (0,142,250), (self.x,self.y), 10)
+        pygame.draw.circle(screen, (0,142,250), (int(self.x),int(self.y)), 10)
 
     def __repr__(self):
         return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %

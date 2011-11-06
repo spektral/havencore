@@ -234,12 +234,12 @@ class GameEngine(object):
                         self.entities.append(SERVER,
                                 Vehicle(dict, sprites['vehicle']))
 
-                    if name in ('Missile', 'HomingMissile'):
+                    if name in ('Rocket', 'HomingMissile'):
                         self.entities.append(SERVER,
                                 Missile(dict, sprites['missile']))
                         jukebox.play_sound('rocket')
 
-                    if name == 'Machinegun':
+                    if name == 'MgBullet':
                         self.entities.append(SERVER,
                                 Machinegun(dict))
 
