@@ -106,7 +106,8 @@ def add_sprite(name, filename, size):
 
 
 def load_sprites():
-    add_sprite('vehicle',           'crawler_sprites.png', (128, 128))
+    add_sprite('vehicle',           'roller.png',          (128, 128))
+    add_sprite('turret',            'turret.png',          (128, 128))
     add_sprite('missile',           'missile2.png',        (32, 32))
     add_sprite('vehicle_explosion', 'blast.png',           (96, 96))
     add_sprite('missile_explosion', 'explosion2.png',      (64, 64))

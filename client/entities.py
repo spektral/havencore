@@ -6,7 +6,7 @@ Classes for game entities.
 
 """
 
-from math import floor, radians, sin, cos
+from math import *
 from os import path
 
 import logging
@@ -27,6 +27,26 @@ __copyright__ = "Copyright 2011, Daladevelop"
 __license__   = "GPL"
 
 
+def look_at((eye_x, eye_y), (tgt_x, tgt_y)):
+
+    """Calculate the angle of a vector"""
+
+    nx = tgt_x - eye_x
+    ny = tgt_y - eye_y
+
+    cx, cy = (0, 1)
+
+    norm = sqrt(nx * nx + ny * ny)
+    (nx, ny) = (nx / norm, ny / norm)
+
+    dot = nx * cx + ny * cy
+
+    if nx < 0:
+        return degrees(acos(-dot)) + 180
+    else:
+        return degrees(acos(dot))
+
+
 class Entity:
     def __init__(self, (x, y), r):
         self.x = x
@@ -41,6 +61,11 @@ class Vehicle:
         self.logger = logging.getLogger('client.entities.Vehicle')
         self.sprite = RotSprite(sprite)
         self.alive_locally = True
+        self.turret = Turret(parent=self, offset=0,
+                sprite=sprites['turret'])
+
+    def handle_input(self, event):
+        self.turret.handle_input(event)
 
     def update(self):
         if not self.alive and self.alive_locally:
@@ -63,11 +88,14 @@ class Vehicle:
 #        self.y += (self.vel * cos(radians(self.rot))) / 2.0
 #        self.x += (self.strafe_vel * sin(radians(self.rot + 90.0))) / 2.0
 #        self.y += (self.strafe_vel * cos(radians(self.rot + 90.0))) / 2.0
+
+        self.turret.update()
         self.sprite.set_direction(self.rot)
 
     def draw(self):
         screen = display.get_surface()
         self.sprite.draw(screen, self.x, self.y)
+        self.turret.draw()
 
     def get_health(self):
         return self.health
@@ -77,6 +105,42 @@ class Vehicle:
         return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
                 (self.__class__.__name__, self.alive, self.x, self.y,
                     self.rot, self.vel))
+
+
+class Turret:
+    def __init__(self, parent, offset, sprite):
+        self.logger = logging.getLogger('client.entities.Turret')
+        self.parent = parent
+        self.offset = offset
+        self.rot = 0
+
+        self.x = self.parent.x + self.offset * sin(radians(self.parent.rot))
+        self.y = self.parent.y + self.offset * cos(radians(self.parent.rot))
+
+        self.sprite = RotSprite(sprite)
+        self.alive_locally = True
+
+    def handle_input(self, event):
+        if event.type == MOUSEMOTION:
+            self.rot = look_at((self.x, self.y), event.pos)
+
+    def update(self):
+        if not self.parent.alive_locally:
+            self.alive_locally = False
+
+        self.x = self.parent.x + self.offset * sin(radians(self.parent.rot))
+        self.y = self.parent.y + self.offset * cos(radians(self.parent.rot))
+
+        while self.rot < 0.0:
+            self.rot += 360.0
+        while self.rot >= 360.0:
+            self.rot -= 360.0
+
+        self.sprite.set_direction(self.rot)
+
+    def draw(self):
+        screen = display.get_surface()
+        self.sprite.draw(screen, self.x, self.y)
 
 
 class Missile:
@@ -124,7 +188,7 @@ class Machinegun:
         self.__dict__ = dict
         self.alive_locally = True
 
-    def handle_input(self):
+    def handle_input(self, event):
         pass
 
     def update(self):
@@ -151,7 +215,7 @@ class LandMine:
         self.__dict__ = dict
         self.alive_locally = True
 
-    def handle_input(self):
+    def handle_input(self, event):
         pass
 
     def update(self):

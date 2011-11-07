@@ -61,13 +61,13 @@ class EntityContainer:
                 if not layer[n].alive:
                     del layer[n]
 
-    def handle_events(self):
+    def handle_event(self, event):
 
         """Triggers the event handler for all entities"""
 
         for layer in self.layers:
             for entity in layer:
-                entity.handle_events()
+                entity.handle_input(event)
 
     def update(self):
 

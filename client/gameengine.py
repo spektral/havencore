@@ -192,6 +192,8 @@ class GameEngine(object):
                     self.quit()
                     break
 
+            self.entities.handle_event(event)
+
             if event.type in (KEYDOWN, KEYUP):
                 events.append({ 'type': event.type, 'key': event.key })
             
