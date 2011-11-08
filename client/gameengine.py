@@ -29,7 +29,7 @@ from graphics import sprites
 from defines import *
 from jukebox import jukebox
 from mapHandler import MapHandler
-from HUD import HUD
+from hud import hud
 
 __author__    = "Gustav Fahlén, Christofer Odén, Max Sidenstjärna"
 __credits__   = ["Gustav Fahlén", "Christofer Odén", "Max Sidenstjärna"]
@@ -48,7 +48,7 @@ class Connection:
 
     def __init__(self, username, addr):
 
-        """Initialize the server"""
+        """Initialize connection data"""
 
         self.logger = logging.getLogger('client.gameengine.Connection')
 
@@ -145,7 +145,7 @@ class GameEngine(object):
 
         self.entities = entity_container
 
-        self.HUD = HUD((250,650))
+        self.hud = hud()
 
         jukebox.initialize()
         graphics.load_sprites()
@@ -214,6 +214,8 @@ class GameEngine(object):
         self.map_handler.update()
         self.get_server_state()
 
+        self.hud.update(self.entities.get_player_vehicle(self.username))
+
     def get_server_state(self):
 
         """Get state from server and update accordingly."""
@@ -268,12 +270,10 @@ class GameEngine(object):
 
         """Draw stuff to the screen."""
 
-        self.screen.fill((66, 66, 111))
+        self.screen.fill((0, 0, 50))
         self.map_handler.draw(self.screen)
-
         self.entities.draw()
-
-        self.HUD.draw(self.screen)
+        self.hud.draw()
 
         pygame.display.update()
 

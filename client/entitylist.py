@@ -85,6 +85,17 @@ class EntityContainer:
             for entity in layer:
                 entity.draw()
 
+    def get_player_vehicle(self, player):
+        for entity in self.layers[SERVER]:
+            try:
+                if (entity.player == player and
+                        entity.__class__.__name__ == 'Vehicle'):
+                    return entity
+            except AttributeError:
+                pass
+
+        return None
+
     def get_with_serial(self, serial, layer=None):
 
         """Search for an entity with matching serial, return result."""
