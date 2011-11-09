@@ -215,7 +215,8 @@ class GameEngine(object):
         self.map_handler.update()
         self.get_server_state()
 
-        self.hud.update(self.entities.get_player_vehicle(self.username))
+        vehicles = self.entities.get_all_vehicles()
+        self.hud.update(vehicles, self.username)
 
     def get_server_state(self):
 
