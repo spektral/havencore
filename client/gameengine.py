@@ -24,7 +24,7 @@ from entitylist import entity_container
 from entitylist import *
 
 import graphics
-from graphics import sprites
+from graphics import spritemaps
 
 from defines import *
 from jukebox import jukebox
@@ -215,7 +215,8 @@ class GameEngine(object):
         self.map_handler.update()
         self.get_server_state()
 
-        self.hud.update(self.entities.get_player_vehicle(self.username))
+        vehicles = self.entities.get_all_vehicles()
+        self.hud.update(vehicles, self.username)
 
     def get_server_state(self):
 
@@ -237,11 +238,11 @@ class GameEngine(object):
                 if not entity:
                     if name == 'Vehicle':
                         self.entities.append(SERVER,
-                                Vehicle(dict, sprites['vehicle']))
+                                Vehicle(dict, spritemaps['vehicle']))
 
                     if name in ('Rocket', 'HomingMissile'):
                         self.entities.append(SERVER,
-                                Missile(dict, sprites['missile']))
+                                Missile(dict, spritemaps['missile']))
                         jukebox.play_sound('rocket')
 
                     if name == 'MgBullet':

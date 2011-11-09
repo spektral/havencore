@@ -5,7 +5,7 @@
 
 import logging
 
-__author__    = "Christofer Odén"
+__author__    = "Christofer Odén. Gustav Fahlén"
 __copyright__ = "Copyright 2011 Daladevelop"
 __license__   = "GPL"
 
@@ -63,6 +63,7 @@ class EntityContainer:
 
     def handle_event(self, event):
 
+
         """Triggers the event handler for all entities"""
 
         for layer in self.layers:
@@ -96,6 +97,18 @@ class EntityContainer:
 
         return None
 
+    def get_all_vehicles(self):
+        
+        """ Return all vehicles in the list  """
+        vehicles = []
+        for entity in self.layers[SERVER]:
+            try:
+                if(entity.__class__.__name__ == 'Vehicle'):
+                    vehicles.append(entity)
+            except AttributeError:
+                pass
+        return vehicles
+
     def get_with_serial(self, serial, layer=None):
 
         """Search for an entity with matching serial, return result."""
@@ -122,3 +135,5 @@ class EntityContainer:
 
 
 entity_container = EntityContainer()
+
+# vim: ts=4 et tw=79 cc=+1
