@@ -167,6 +167,7 @@ class GameEngine(object):
             self.update()
             self.draw()
             self.fps_clock.tick(50)
+        pygame.quit()
 
     def quit(self):
 
