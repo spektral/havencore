@@ -41,15 +41,20 @@ class NamePlates:
         self.fonts = font.SysFont("none", 20)
        
     def update(self, entity):
+        self.vehicles = {}
         for vehicle in entity:
-            self.vehicles[vehicle.player] = (int(vehicle.x - 15), int(vehicle.y - 70))
-    def draw(self):
+            if vehicle.alive:
+                self.vehicles[vehicle.player] = (int(vehicle.x - 15), int(vehicle.y - 70))
+    def draw(self, username):
         screen = display.get_surface()
         for name in self.vehicles.keys():
-            text = self.fonts.render(name, 1, (255,255,0))
-            screen.blit(text, self.vehicles[name])
-         
-
+            if name == username:
+                text = self.fonts.render(name, 1, (0,255,0))
+                screen.blit(text, self.vehicles[name])
+            else:
+                text = self.fonts.render(name, 1, (255,0,0))
+                screen.blit(text, self.vehicles[name])
+ 
 class hud:
 
     """Heads Up Display
@@ -62,8 +67,9 @@ class hud:
         self.health_bar = Bar(
                 Rect(10, screen_h - 20, 300, 10), 100, (200, 0, 0))
         self.name_plates = NamePlates()
-
+        self.player_name = ""
     def update(self, entities, username):
+        self.player_name = username
         if (entities):
             for vehicle in entities:
                 if vehicle.player == username:
@@ -75,6 +81,6 @@ class hud:
         
     def draw(self):
         self.health_bar.draw()
-        self.name_plates.draw()
+        self.name_plates.draw(self.player_name)
 
 # vim: ts=4 et tw=79 cc=+1
