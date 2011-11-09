@@ -26,9 +26,10 @@ from entitylist import *
 import graphics
 from graphics import spritemaps
 
-from defines import *
 from jukebox import jukebox
-from maphandler import MapHandler
+
+from terraindata import TerrainData
+
 from hud import hud
 
 __author__    = "Gustav Fahlén, Christofer Odén, Max Sidenstjärna"
@@ -135,20 +136,24 @@ class GameEngine(object):
 
         self.logger.info("Initializing pygame...")
         pygame.init()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+        modes = pygame.display.list_modes()
+        self.screen = pygame.display.set_mode(modes[1])
         pygame.display.set_caption("Haven Core")
 
         self.username = username
         self.connection = Connection(username, addr)
 
-        self.map_handler = MapHandler(10000, 10000, 40)
+        graphics.load_sprites()
+
+        self.terrain_data = TerrainData('client/data/terraindata.map',
+                                        spritemaps['terrain'])
 
         self.entities = entity_container
 
         self.hud = hud()
 
         jukebox.initialize()
-        graphics.load_sprites()
 
     def start(self):
 
@@ -183,7 +188,6 @@ class GameEngine(object):
         events = []
 
         for event in pygame.event.get():
-            self.map_handler.handle_input(event)
             if event.type == QUIT:
                 self.quit()
                 break
@@ -212,7 +216,6 @@ class GameEngine(object):
 
         """Perform client side logic and fetch updates from server."""
 
-        self.map_handler.update()
         self.get_server_state()
 
         vehicles = self.entities.get_all_vehicles()
@@ -273,7 +276,6 @@ class GameEngine(object):
         """Draw stuff to the screen."""
 
         self.screen.fill((0, 0, 50))
-        self.map_handler.draw(self.screen)
         self.entities.draw()
         self.hud.draw()
 

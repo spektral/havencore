@@ -1,10 +1,7 @@
 #!/usr/bin/python2 -tt
 # -*- coding: utf-8 -*-
 
-"""
-Module for purely visual stuff.
-
-"""
+"""Module for purely visual stuff"""
 
 from os import path
 from math import floor
