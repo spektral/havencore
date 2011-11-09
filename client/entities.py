@@ -62,7 +62,7 @@ class Vehicle:
         self.sprite = RotSprite(sprite)
         self.alive_locally = True
         self.turret = Turret(parent=self, offset=0,
-                sprite=sprites['turret'])
+                sprite=spritemaps['turret'])
 
     def handle_input(self, event):
         self.turret.handle_input(event)
@@ -74,7 +74,7 @@ class Vehicle:
             self.health = 0
             entity_container.append(LOCAL,
                     Explosion((self.x, self.y),
-                              sprites['vehicle_explosion'], 10))
+                              spritemaps['vehicle_explosion'], 10))
             self.alive_locally = False
 
         #self.rot += self.torque / 4.0
@@ -162,7 +162,7 @@ class Missile:
             entity_container.append(
                     LOCAL,
                     Explosion((self.x, self.y),
-                        sprites['missile_explosion'], 4))
+                        spritemaps['missile_explosion'], 4))
             self.alive_locally = False
 
         self.x += self.vel * sin(radians(self.rot))
@@ -224,7 +224,7 @@ class LandMine:
             entity_container.append(
                     LOCAL,
                     Explosion((self.x, self.y),
-                        sprites['missile_explosion'], 4))
+                        spritemaps['missile_explosion'], 4))
             self.alive_locally = False
 
     def draw(self):
@@ -251,7 +251,7 @@ class Explosion(Entity):
 
     def update(self): 
         self.animation.update()
-        if self.animation.finished == True:
+        if self.animation.visible == False:
             self.alive = False
 
     def draw(self):
