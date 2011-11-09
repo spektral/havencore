@@ -145,6 +145,9 @@ class Server:
                 event = Event(event['type'], { 'button': event['button'],
                                                'pos': event['pos'] })
 
+            elif event['type'] == MOUSEMOTION:
+                event = Event(event['type'], { 'pos': event['pos'] })
+
             event_list.append(event)
 
         return username, event_list
