@@ -92,9 +92,9 @@ class Vehicle:
         self.turret.update()
         self.sprite.set_direction(self.rot)
 
-    def draw(self, x, y):
+    def draw(self):
         screen = display.get_surface()
-        self.sprite.draw(screen, (x, y))
+        self.sprite.draw(screen, self.x, self.y)
         self.turret.draw()
 
     def get_health(self):
@@ -138,9 +138,9 @@ class Turret:
 
         self.sprite.set_direction(self.rot)
 
-    def draw(self, x, y)
+    def draw(self):
         screen = display.get_surface()
-        self.sprite.draw(screen, x, y)
+        self.sprite.draw(screen, self.x, self.y)
 
 
 class Missile:
@@ -169,9 +169,9 @@ class Missile:
         self.y += self.vel * cos(radians(self.rot))
         self.sprite.set_direction(self.rot)
 
-    def draw(self, x, y):
+    def draw(self):
         screen = display.get_surface()
-        self.sprite.draw(screen, x, y)
+        self.sprite.draw(screen, self.x, self.y)
 
     def __repr__(self):
         """Return a string representation of the instance."""
@@ -198,9 +198,9 @@ class Machinegun:
         self.x += self.vel * sin(radians(self.rot))
         self.y += self.vel * cos(radians(self.rot))
 
-    def draw(self, x, y):
+    def draw(self):
         screen = display.get_surface()
-        pygame.draw.circle(screen, (0,0,0), (int(x + 0.5),int(y + 0.5)), 2)
+        pygame.draw.circle(screen, (0,0,0), (int(self.x + 0.5),int(self.y + 0.5)), 2)
 
     def __repr__(self):
         return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
@@ -227,9 +227,9 @@ class LandMine:
                         spritemaps['missile_explosion'], 4))
             self.alive_locally = False
 
-    def draw(self, x, y):
+    def draw(self):
         screen = display.get_surface()
-        pygame.draw.circle(screen, (0,142,250), (int(x),int(y)), 10)
+        pygame.draw.circle(screen, (0,142,250), (int(self.x),int(self.y)), 10)
 
     def __repr__(self):
         return ('<%s(alive=%s, x=%0.2f, y=%0.2f, rot=%0.2f, vel=%0.2f)>' %
@@ -254,8 +254,8 @@ class Explosion(Entity):
         if self.animation.visible == False:
             self.alive = False
 
-    def draw(self, x, y):
+    def draw(self):
         screen = display.get_surface()
-        self.animation.draw(screen, x, y)
+        self.animation.draw(screen, self.x, self.y)
 
 # vim: ts=4 et tw=79 cc=+1
