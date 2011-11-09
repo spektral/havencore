@@ -28,7 +28,7 @@ from graphics import sprites
 
 from defines import *
 from jukebox import jukebox
-from mapHandler import MapHandler
+from maphandler import MapHandler
 from hud import hud
 
 __author__    = "Gustav Fahlén, Christofer Odén, Max Sidenstjärna"
