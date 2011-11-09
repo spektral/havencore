@@ -204,6 +204,8 @@ class GameEngine(object):
                                 'pos': event.pos })
                 self.logger.debug(repr(events[-1]))
 
+        events.append({ 'type': MOUSEMOTION, 'pos': pygame.mouse.get_pos() })
+
         # Only bother to transmit events that matter
         if events:
             self.connection.transmit({ 'label': 'events', 'events': events })

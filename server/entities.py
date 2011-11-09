@@ -126,6 +126,8 @@ class Vehicle(Entity):
         self.init_weapons()
         self.weapon = Rocket
 
+        self.mouse_pos = 0
+
     def init_weapons(self):
 
         """Initialize member data belonging to weapons"""
@@ -217,15 +219,18 @@ class Vehicle(Entity):
             if event.button == 1:
                 self.is_firing = True
                 self.turret_rot = look_at((self.x, self.y), event.pos)
-            if event.button == 2:
+            if event.button == 3:
                 self.is_firing = True
                 self.turret_rot = look_at((self.x, self.y), event.pos)
 
         elif event.type == MOUSEBUTTONUP:
             if event.button == 1:
                 self.is_firing = False
-            if event.button == 2:
+            if event.button == 3:
                 self.is_firing = False
+
+        if event.type == MOUSEMOTION:
+            self.mouse_pos = event.pos
 
     def update(self):
         Entity.update(self)
@@ -253,6 +258,8 @@ class Vehicle(Entity):
         self.y += (self.strafe_vel * cos(radians(self.rot + 90.0))) / 2.0
 
         self.weapon_update()
+
+        #self.logger.debug(self.mouse_pos)
         
     def weapon_update(self):
 
@@ -274,6 +281,8 @@ class Vehicle(Entity):
             self.logger.info("Ammo: %d" % self.ammo)
             if self.ammo == 0:
                 self.reload_cooldown = self.reload_time
+
+            self.turret_rot = look_at((self.x, self.y), self.mouse_pos)
 
     def fire(self):
 
