@@ -95,8 +95,11 @@ class Connection:
 
         read_list = [self.socket]
         readable, writable, in_error = select.select(read_list, [], [], 0)
-        for socket in readable:
-            servername, state = net.receive(self.socket)
+        try: 
+            for socket in readable:
+                servername, state = net.receive(self.socket)
+        except ValueError:
+            state = None
 
         if state == None:
             return []
