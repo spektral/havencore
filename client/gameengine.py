@@ -99,6 +99,7 @@ class Connection:
             for socket in readable:
                 servername, state = net.receive(self.socket)
         except ValueError:
+            self.logger.error("gameengine.get_state: ValueError")
             state = None
 
         if state == None:
